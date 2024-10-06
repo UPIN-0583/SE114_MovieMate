@@ -28,6 +28,10 @@
             android:name=".MainActivity"
             android:exported="false">
         </activity>
+        <meta-data
+            android:name="com.google.android.gms.auth.api.gmscore.client_id"
+            android:value="@string/default_web_client_id" />
     </application>
 
+    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>
