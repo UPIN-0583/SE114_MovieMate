@@ -1,46 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="base_text_style">
-        <item name="android:fontFamily">@font/sf_pro</item>
-    </style>
-
-    <style name="payment_title" parent="base_text_style">
+    <style name="payment_title">
         <item name="android:textSize">28sp</item>
         <item name="android:textColor">@color/white</item>
+        <item name="android:fontFamily">@font/sf_pro</item>
     </style>
-
-    <style name="payment_name" parent="base_text_style">
+    <style name="payment_name">
         <item name="android:textSize">16sp</item>
         <item name="android:textColor">@color/white</item>
+        <item name="android:fontFamily">@font/sf_pro</item>
     </style>
-
-    <style name="text_button" parent="base_text_style">
+    <style name="text_button">
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">@color/black</item>
+        <item name="android:fontFamily">@font/sf_pro</item>
     </style>
-
-    <style name="payment_method" parent="base_text_style">
+    <style name="payment_method">
         <item name="android:textSize">24sp</item>
         <item name="android:textColor">@color/white</item>
+        <item name="android:fontFamily">@font/sf_pro</item>
     </style>
-
-    <style name="text_label" parent="base_text_style">
+    <style name="text_label">
         <item name="android:textSize">16sp</item>
         <item name="android:textColor">@color/white</item>
+        <item name="android:fontFamily">@font/sf_pro</item>
     </style>
-
-    <style name="text_label_highlight" parent="base_text_style">
+    <style name="text_label_highlight">
         <item name="android:textSize">16sp</item>
         <item name="android:textColor">@color/yellow</item>
+        <item name="android:fontFamily">@font/sf_pro</item>
     </style>
-
-    <style name="apply" parent="base_text_style">
+    <style name="apply">
         <item name="android:textSize">16sp</item>
         <item name="android:textColor">@color/black</item>
+        <item name="android:fontFamily">@font/sf_pro</item>
     </style>
-
-    <style name="vnd" parent="base_text_style">
+    <style name="vnd">
         <item name="android:textSize">24sp</item>
         <item name="android:textColor">@color/yellow</item>
+        <item name="android:fontFamily">@font/sf_pro</item>
     </style>
 </resources>
