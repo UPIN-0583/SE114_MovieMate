@@ -1,4 +1,15 @@
 <resources>
     <string name="app_name">MovieMate</string>
     <string name="default_web_client_id">911594189329-jkujn8ejiec5ho371p1mlvers0eoa4qa.apps.googleusercontent.com</string>
+    <string name="payment_title">Payment</string>
+    <string name="logo_of_payment_method">Logo of payment method</string>
+    <string name="payment">Payment</string>
+    <string name="payment_method">Payment Method</string>
+    <string name="pay">Pay</string>
+    <string name="total">Total</string>
+    <string name="apply">Apply</string>
+    <string name="discount_code">Discount code</string>
+    <string name="order_id">Order ID</string>
+    <string name="seat">Seat</string>
+    <string name="complete_your_payment_in">Complete your payment in</string>
 </resources>
