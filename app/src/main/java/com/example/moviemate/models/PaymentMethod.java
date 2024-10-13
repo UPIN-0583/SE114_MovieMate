@@ -1,7 +1,5 @@
 package com.example.moviemate.models;
 
-import android.content.Context;
-
 public class PaymentMethod {
     public static enum TYPE {
         ZALO_PAY,
