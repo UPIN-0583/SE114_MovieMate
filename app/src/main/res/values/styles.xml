@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="base_text_style">
+        <item name="android:fontFamily">@font/sf_pro</item>
+    </style>
+
+    <style name="payment_title" parent="base_text_style">
+        <item name="android:textSize">28sp</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="payment_name" parent="base_text_style">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="text_button" parent="base_text_style">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="payment_method" parent="base_text_style">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="text_label" parent="base_text_style">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="text_label_highlight" parent="base_text_style">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/yellow</item>
+    </style>
+
+    <style name="apply" parent="base_text_style">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="vnd" parent="base_text_style">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/yellow</item>
+    </style>
+</resources>
