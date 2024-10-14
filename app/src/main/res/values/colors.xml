@@ -10,4 +10,9 @@
     <color name="white">#F2F2F2</color>
     <color name="black2">#1A1A1A</color>
     <color name="yellow">#FCC434</color>
+    <color name="ripple_color">#C99C29</color>
+    <color name="black3">#1C1C1C</color>
+    <color name="dark_yellow">#261D08</color>
+    <color name="dark_gray">#1c1c1c</color>
+    <color name="soft_dark_gray">#595959</color>
 </resources>
