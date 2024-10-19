@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.example.moviemate.fragments.HomeFragment;
+import com.example.moviemate.fragments.MovieFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -37,8 +38,9 @@ public class MainActivity extends AppCompatActivity {
 //// else if bạn muốn thêm các Fragment khác sau này, bạn có thể thêm tiếp các điều kiện:
 //                else if (item.getItemId() == R.id.nav_ticket) {
 //                    selectedFragment = new TicketFragment();
-//                } else if (item.getItemId() == R.id.nav_movie) {
-//                    selectedFragment = new MovieFragment();
+                else if (item.getItemId() == R.id.nav_movie) {
+                    selectedFragment = new MovieFragment();
+                }
 //                } else if (item.getItemId() == R.id.nav_profile) {
 //                    selectedFragment = new ProfileFragment();
 //                }
