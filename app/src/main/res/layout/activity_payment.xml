@@ -126,6 +126,7 @@
             android:paddingTop="11dp"
             android:paddingEnd="12dp"
             android:paddingBottom="11dp"
+            android:textColorHint="#99FFFFFF"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/applyDiscountBtn"
             app:layout_constraintStart_toStartOf="parent"
