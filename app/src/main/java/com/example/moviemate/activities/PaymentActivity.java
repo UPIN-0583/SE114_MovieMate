@@ -40,10 +40,5 @@ public class PaymentActivity extends AppCompatActivity {
 
         ListView paymentMethodListView = findViewById(R.id.paymentMethodListView);
         paymentMethodListView.setAdapter(adapter);
-
-        Toolbar paymentToolbar = findViewById(R.id.paymentToolbar);
-        paymentToolbar.setTitle("");
-        setSupportActionBar(paymentToolbar);
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
     }
 }

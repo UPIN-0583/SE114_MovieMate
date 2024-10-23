@@ -10,6 +10,8 @@
         <!-- Màu chính (primary) là nút Sign in màu vàng -->
         <item name="colorPrimary">@color/yellow</item>
 
+        <item name="colorOnPrimary">@color/black</item>
+
         <!-- Màu cho các nút khác như nút Facebook, Google (thường màu đen) -->
         <item name="colorPrimaryVariant">@color/black2</item>
 
