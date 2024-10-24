@@ -65,6 +65,7 @@
             android:id="@+id/register_email"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="40dp"
             android:drawableStart="@drawable/user"
             android:drawablePadding="16dp"
             android:hint="@string/enter_your_email"
@@ -77,35 +78,78 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
-        <EditText
-            android:id="@+id/register_password"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout10"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:drawableStart="@drawable/lock"
-            android:drawablePadding="16dp"
-            android:hint="@string/enter_your_password"
-            android:inputType="textPassword"
-            android:paddingTop="24dp"
-            android:paddingBottom="24dp"
-            android:textColorHint="@color/text_hint"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/register_email" />
+            app:layout_constraintTop_toBottomOf="@+id/register_email">
 
-        <EditText
-            android:id="@+id/register_confirm_password"
+            <EditText
+                android:id="@+id/register_password"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/lock"
+                android:drawablePadding="16dp"
+                android:hint="@string/enter_your_password"
+                android:inputType="textPassword"
+                android:paddingTop="24dp"
+                android:paddingBottom="24dp"
+                android:textColorHint="@color/text_hint"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/register_show_hide_password"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/register_show_hide_password"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_show_pass"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout9"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:drawableStart="@drawable/lock"
-            android:drawablePadding="16dp"
-            android:hint="@string/confirm_password"
-            android:inputType="textPassword"
-            android:paddingTop="24dp"
-            android:paddingBottom="24dp"
-            android:textColorHint="@color/text_hint"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/register_password" />
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout10">
+
+            <EditText
+                android:id="@+id/register_confirm_password"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/lock"
+                android:drawablePadding="16dp"
+                android:hint="@string/confirm_password"
+                android:inputType="textPassword"
+                android:paddingTop="24dp"
+                android:paddingBottom="24dp"
+                android:textColorHint="@color/text_hint"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/register_show_hide_confirm_password"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/register_show_hide_confirm_password"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_show_pass"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <Button
             android:id="@+id/register_button"
@@ -117,7 +161,7 @@
             android:textAppearance="@style/text_button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/register_confirm_password" />
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout9" />
 
         <TextView
             android:id="@+id/login_link"
