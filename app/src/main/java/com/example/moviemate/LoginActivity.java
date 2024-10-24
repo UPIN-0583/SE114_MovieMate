@@ -2,6 +2,7 @@ package com.example.moviemate;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Button;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.splashscreen.SplashScreen;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -33,6 +35,15 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
+        splashScreen.setKeepOnScreenCondition(new SplashScreen.KeepOnScreenCondition() {
+            @Override
+            public boolean shouldKeepOnScreen() {
+                // Add logic to determine when to remove the splash screen
+                return false;
+            }
+        });
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
