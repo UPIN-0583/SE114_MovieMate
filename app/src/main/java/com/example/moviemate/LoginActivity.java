@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.splashscreen.SplashScreen;
 
 import com.example.moviemate.activities.ForgotPasswordActivity;
+import com.example.moviemate.utils.CustomDialog;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -82,19 +83,24 @@ public class LoginActivity extends AppCompatActivity {
         String password = passwordField.getText().toString().trim();
 
         if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-            Toast.makeText(this, "Please enter all details", Toast.LENGTH_SHORT).show();
+            CustomDialog.showAlertDialog(LoginActivity.this, R.drawable.ic_error, "Error", "Please enter all details", false);
             return;
         }
 
+        Button loginButton = findViewById(R.id.login_button);
+        loginButton.setEnabled(false);
+
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
+                    loginButton.setEnabled(true);
+
                     if (task.isSuccessful()) {
                         Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
                         // Điều hướng tới màn hình khác nếu cần
                     } else {
-                        Toast.makeText(LoginActivity.this, "Login failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        CustomDialog.showAlertDialog(LoginActivity.this, R.drawable.ic_error, "Error", "Login failed: " + task.getException().getMessage(), false);
                     }
                 });
     }
