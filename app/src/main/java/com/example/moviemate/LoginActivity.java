@@ -2,19 +2,20 @@ package com.example.moviemate;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.core.splashscreen.SplashScreen;
 
+import com.example.moviemate.activities.ForgotPasswordActivity;
+import com.example.moviemate.utils.CustomDialog;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -29,14 +30,24 @@ import com.google.firebase.auth.GoogleAuthProvider;
 public class LoginActivity extends AppCompatActivity {
 
     private EditText emailField, passwordField;
-    private Button loginButton;
-    private TextView registerLink;
     private FirebaseAuth mAuth;
     private static final int RC_SIGN_IN = 9001;
     private GoogleSignInClient mGoogleSignInClient;
 
+    private boolean passwordVisible = false;
+    private ImageButton showHidePasswordButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
+        splashScreen.setKeepOnScreenCondition(new SplashScreen.KeepOnScreenCondition() {
+            @Override
+            public boolean shouldKeepOnScreen() {
+                // Add logic to determine when to remove the splash screen
+                return false;
+            }
+        });
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
@@ -44,15 +55,24 @@ public class LoginActivity extends AppCompatActivity {
 
         emailField = findViewById(R.id.login_email);
         passwordField = findViewById(R.id.login_password);
-        loginButton = findViewById(R.id.login_button);
-        registerLink = findViewById(R.id.register_link);
+        Button loginButton = findViewById(R.id.login_button);
+        TextView registerLink = findViewById(R.id.register_link);
+        TextView forgotPasswordLink = findViewById(R.id.forgot_password_link);
+        showHidePasswordButton = findViewById(R.id.login_show_hide_password_btn);
+        showHidePasswordButton.setOnClickListener(view -> {
+            showHidePassword();
+        });
 
         loginButton.setOnClickListener(view -> loginUser());
 
         registerLink.setOnClickListener(view -> {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
-            finish();
+        });
+
+        forgotPasswordLink.setOnClickListener(view -> {
+            Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
+            startActivity(intent);
         });
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -63,7 +83,20 @@ public class LoginActivity extends AppCompatActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         findViewById(R.id.google_sign_in_button).setOnClickListener(v -> signInWithGoogle());
+    }
 
+    private void showHidePassword() {
+        if (passwordVisible) {
+            passwordField.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            showHidePasswordButton.setImageResource(R.drawable.ic_show_pass);
+
+        } else {
+            passwordField.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            showHidePasswordButton.setImageResource(R.drawable.ic_hide_pass);
+        }
+
+        passwordVisible = !passwordVisible;
+        passwordField.setSelection(passwordField.getText().length()); // Move cursor to the end of the text
     }
 
     private void loginUser() {
@@ -71,19 +104,24 @@ public class LoginActivity extends AppCompatActivity {
         String password = passwordField.getText().toString().trim();
 
         if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-            Toast.makeText(this, "Please enter all details", Toast.LENGTH_SHORT).show();
+            CustomDialog.showAlertDialog(LoginActivity.this, R.drawable.ic_error, "Error", "Please enter all details", false);
             return;
         }
 
+        Button loginButton = findViewById(R.id.login_button);
+        loginButton.setEnabled(false);
+
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
+                    loginButton.setEnabled(true);
+
                     if (task.isSuccessful()) {
                         Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
-                        // Điều hướng tới màn hình khác nếu cần
+                        finish(); // Prevent user from going back to login screen
                     } else {
-                        Toast.makeText(LoginActivity.this, "Login failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        CustomDialog.showAlertDialog(LoginActivity.this, R.drawable.ic_error, "Error", "Login failed: " + task.getException().getMessage(), false);
                     }
                 });
     }
@@ -108,7 +146,7 @@ public class LoginActivity extends AppCompatActivity {
                 firebaseAuthWithGoogle(account.getIdToken());
             } catch (ApiException e) {
                 Log.w("LoginActivity", "Google sign in failed", e);
-                Toast.makeText(LoginActivity.this, "Google sign-in failed.", Toast.LENGTH_SHORT).show();
+                CustomDialog.showAlertDialog(LoginActivity.this, R.drawable.ic_error, "Error", "Google sign-in failed.", false);
             }
         }
     }
@@ -121,13 +159,13 @@ public class LoginActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         // Đăng nhập thành công, chuyển đến màn hình chính hoặc xử lý logic khác
                         FirebaseUser user = mAuth.getCurrentUser();
-                        Toast.makeText(LoginActivity.this, "Google sign-in successful.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Google sign-in successful", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
                         // Điều hướng sang màn hình khác
                     } else {
                         // Đăng nhập thất bại
-                        Toast.makeText(LoginActivity.this, "Google sign-in failed.", Toast.LENGTH_SHORT).show();
+                        CustomDialog.showAlertDialog(LoginActivity.this, R.drawable.ic_error, "Error", "Google sign-in failed.", false);
                     }
                 });
     }
