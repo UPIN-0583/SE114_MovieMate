@@ -1,0 +1,187 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="16dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Movie Poster -->
+        <ImageView
+            android:id="@+id/movie_poster"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Movie Title -->
+        <TextView
+            android:id="@+id/movie_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Movie Title"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:paddingTop="16dp"
+            android:textColor="@android:color/white"
+            app:layout_constraintTop_toBottomOf="@id/movie_poster"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/watch_trailer_button" />
+
+        <!-- Watch Trailer Button -->
+        <Button
+            android:id="@+id/watch_trailer_button"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="@android:color/darker_gray"
+            android:padding="10dp"
+            android:text="Watch Trailer"
+            android:textColor="@android:color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/movie_title"
+            app:layout_constraintTop_toBottomOf="@id/movie_poster" />
+
+        <!-- Movie Time -->
+        <TextView
+            android:id="@+id/movie_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Time: 1h 55m"
+            android:paddingTop="8dp"
+            android:textColor="@android:color/white"
+            app:layout_constraintTop_toBottomOf="@id/movie_title"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- Movie Language -->
+        <TextView
+            android:id="@+id/movie_language"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Language: English"
+            android:paddingTop="8dp"
+            android:textColor="@android:color/white"
+            app:layout_constraintTop_toBottomOf="@id/movie_time"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- Movie Rating -->
+        <TextView
+            android:id="@+id/movie_rating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rating: +16"
+            android:paddingTop="8dp"
+            android:textColor="@android:color/white"
+            app:layout_constraintTop_toBottomOf="@id/movie_language"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- Movie Genre -->
+        <TextView
+            android:id="@+id/movie_genre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:text="Movie genre: Adventure, Action"
+            android:textColor="@android:color/white"
+            app:layout_constraintTop_toBottomOf="@id/movie_rating"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- Movie Description -->
+        <TextView
+            android:id="@+id/movie_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Description: This is the movie description"
+            android:paddingTop="16dp"
+            android:textColor="@android:color/white"
+            app:layout_constraintTop_toBottomOf="@id/movie_genre"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- Section for Director -->
+        <TextView
+            android:id="@+id/director_section_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Director"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:paddingTop="16dp"
+            android:textColor="@android:color/white"
+            app:layout_constraintTop_toBottomOf="@id/movie_description"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- RecyclerView for Director List -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/director_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:paddingBottom="8dp"
+            app:layout_constraintTop_toBottomOf="@id/director_section_title"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- Section for Actor -->
+        <TextView
+            android:id="@+id/actor_section_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Actor"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:paddingTop="16dp"
+            android:textColor="@android:color/white"
+            app:layout_constraintTop_toBottomOf="@id/director_recycler_view"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- RecyclerView for Actor List -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/actor_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:paddingBottom="8dp"
+            app:layout_constraintTop_toBottomOf="@id/actor_section_title"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- Section for Cinema -->
+        <TextView
+            android:id="@+id/cinema_section_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cinema"
+            android:visibility="gone"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:paddingTop="16dp"
+            android:textColor="@android:color/white"
+            app:layout_constraintTop_toBottomOf="@id/actor_recycler_view"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- RecyclerView for Cinema List -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/cinema_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/cinema_section_title"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- Continue Button -->
+        <Button
+            android:id="@+id/continue_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Continue"
+            android:visibility="gone"
+            android:textSize="16sp"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="@android:color/holo_orange_dark"
+            android:textColor="@android:color/white"
+            app:layout_constraintTop_toBottomOf="@id/cinema_recycler_view"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
