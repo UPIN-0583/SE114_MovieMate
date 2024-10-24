@@ -28,4 +28,7 @@
     <string name="reset_password_inform">Please enter your email and we will send an link in the next step to reset your password.</string>
     <string name="continue_string">Continue</string>
     <string name="error_icon">Error Icon</string>
+    <string name="register">Register</string>
+    <string name="confirm_password">Confirm your password</string>
+    <string name="already_have_an_account">Already have an account? Login</string>
 </resources>
