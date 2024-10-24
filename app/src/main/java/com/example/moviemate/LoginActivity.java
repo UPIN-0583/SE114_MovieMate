@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.splashscreen.SplashScreen;
 
+import com.example.moviemate.activities.ForgotPasswordActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -27,8 +28,6 @@ import com.google.firebase.auth.GoogleAuthProvider;
 public class LoginActivity extends AppCompatActivity {
 
     private EditText emailField, passwordField;
-    private Button loginButton;
-    private TextView registerLink;
     private FirebaseAuth mAuth;
     private static final int RC_SIGN_IN = 9001;
     private GoogleSignInClient mGoogleSignInClient;
@@ -51,8 +50,9 @@ public class LoginActivity extends AppCompatActivity {
 
         emailField = findViewById(R.id.login_email);
         passwordField = findViewById(R.id.login_password);
-        loginButton = findViewById(R.id.login_button);
-        registerLink = findViewById(R.id.register_link);
+        Button loginButton = findViewById(R.id.login_button);
+        TextView registerLink = findViewById(R.id.register_link);
+        TextView forgotPasswordLink = findViewById(R.id.forgot_password_link);
 
         loginButton.setOnClickListener(view -> loginUser());
 
@@ -60,6 +60,11 @@ public class LoginActivity extends AppCompatActivity {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
             finish();
+        });
+
+        forgotPasswordLink.setOnClickListener(view -> {
+            Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
+            startActivity(intent);
         });
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
