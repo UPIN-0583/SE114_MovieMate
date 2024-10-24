@@ -2,10 +2,12 @@ package com.example.moviemate;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +34,9 @@ public class LoginActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 9001;
     private GoogleSignInClient mGoogleSignInClient;
 
+    private boolean passwordVisible = false;
+    private ImageButton showHidePasswordButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
@@ -53,6 +58,10 @@ public class LoginActivity extends AppCompatActivity {
         Button loginButton = findViewById(R.id.login_button);
         TextView registerLink = findViewById(R.id.register_link);
         TextView forgotPasswordLink = findViewById(R.id.forgot_password_link);
+        showHidePasswordButton = findViewById(R.id.login_show_hide_password_btn);
+        showHidePasswordButton.setOnClickListener(view -> {
+            showHidePassword();
+        });
 
         loginButton.setOnClickListener(view -> loginUser());
 
@@ -74,6 +83,20 @@ public class LoginActivity extends AppCompatActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         findViewById(R.id.google_sign_in_button).setOnClickListener(v -> signInWithGoogle());
+    }
+
+    private void showHidePassword() {
+        if (passwordVisible) {
+            passwordField.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            showHidePasswordButton.setImageResource(R.drawable.ic_show_pass);
+
+        } else {
+            passwordField.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            showHidePasswordButton.setImageResource(R.drawable.ic_hide_pass);
+        }
+
+        passwordVisible = !passwordVisible;
+        passwordField.setSelection(passwordField.getText().length()); // Move cursor to the end of the text
     }
 
     private void loginUser() {
