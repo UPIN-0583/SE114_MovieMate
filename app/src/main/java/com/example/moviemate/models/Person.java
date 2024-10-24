@@ -3,20 +3,20 @@ package com.example.moviemate.models;
 import java.io.Serializable;
 
 public class Person implements Serializable {
-    private String Name;
-    private String PicUrl;
+    private String Name;   // Tên diễn viên hoặc đạo diễn
+    private String PicUrl; // URL ảnh của diễn viên hoặc đạo diễn
 
-    // Constructor mặc định (cần thiết khi sử dụng Firebase hoặc bất kỳ library nào yêu cầu Constructor trống)
+    // Constructor mặc định (Firebase yêu cầu)
     public Person() {
     }
 
-    // Constructor để khởi tạo đối tượng Person
+    // Constructor đầy đủ để khởi tạo Person
     public Person(String name, String picUrl) {
         this.Name = name;
         this.PicUrl = picUrl;
     }
 
-    // Getter và Setter cho tên và URL ảnh
+    // Getters và Setters
     public String getName() {
         return Name;
     }

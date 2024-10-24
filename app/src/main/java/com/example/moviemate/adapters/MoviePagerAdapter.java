@@ -15,9 +15,9 @@ public class MoviePagerAdapter extends FragmentStateAdapter {
     @Override
     public Fragment createFragment(int position) {
         if (position == 0) {
-            return MovieListFragment.newInstance("Items"); // Now Playing
+            return MovieListFragment.newInstance("Now Playing"); // Now Playing
         } else {
-            return MovieListFragment.newInstance("Upcomming"); // Coming Soon
+            return MovieListFragment.newInstance("Coming Soon"); // Coming Soon
         }
     }
 

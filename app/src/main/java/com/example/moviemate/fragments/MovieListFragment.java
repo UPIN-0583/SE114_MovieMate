@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.moviemate.R;
 import com.example.moviemate.adapters.Movie2Adapter;
-import com.example.moviemate.adapters.MovieAdapter;
 import com.example.moviemate.models.Movie;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -26,17 +25,17 @@ import java.util.List;
 
 public class MovieListFragment extends Fragment {
 
-    private static final String ARG_CATEGORY = "category";
+    private static final String ARG_STATUS = "status"; // Dùng status
 
     private RecyclerView recyclerView;
     private Movie2Adapter movieAdapter;
     private List<Movie> movieList;
-    private String category;
+    private String status;
 
-    public static MovieListFragment newInstance(String category) {
+    public static MovieListFragment newInstance(String status) {
         MovieListFragment fragment = new MovieListFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_CATEGORY, category);
+        args.putString(ARG_STATUS, status);
         fragment.setArguments(args);
         return fragment;
     }
@@ -58,24 +57,26 @@ public class MovieListFragment extends Fragment {
         recyclerView.setAdapter(movieAdapter);
 
         if (getArguments() != null) {
-            category = getArguments().getString(ARG_CATEGORY);
+            status = getArguments().getString(ARG_STATUS);
         }
 
-        loadMoviesFromDatabase();
+        loadMoviesFromDatabase();  // Tải phim từ cơ sở dữ liệu dựa trên status
 
         return view;
     }
 
     private void loadMoviesFromDatabase() {
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(category);
+        DatabaseReference moviesRef = FirebaseDatabase.getInstance().getReference("Movies");
 
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        moviesRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 movieList.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Movie movie = snapshot.getValue(Movie.class);
-                    movieList.add(movie);
+                    if (movie != null && status.equals(movie.getStatus())) {  // Lọc phim theo status
+                        movieList.add(movie);
+                    }
                 }
                 movieAdapter.notifyDataSetChanged();
             }

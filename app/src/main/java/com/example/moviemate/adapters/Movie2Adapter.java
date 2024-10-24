@@ -1,7 +1,7 @@
 package com.example.moviemate.adapters;
 
 import android.content.Context;
-import android.text.TextUtils;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +11,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-
 import com.example.moviemate.R;
+import com.example.moviemate.activities.MovieDetailActivity;
 import com.example.moviemate.models.Movie;
 import com.squareup.picasso.Picasso;
 
@@ -40,14 +40,31 @@ public class Movie2Adapter extends RecyclerView.Adapter<Movie2Adapter.MovieViewH
         Movie movie = movieList.get(position);
         holder.title.setText(movie.getTitle());
         holder.time.setText(movie.getTime());
-        holder.genre.setText(TextUtils.join(", ", movie.getGenre()));
-        Picasso.get().load(movie.getPoster()).into(holder.posterImage);
-    }
 
+        // Hiển thị thể loại phim
+        List<String> genres = movie.getGenre();
+        holder.genre.setText(genres != null && !genres.isEmpty()
+                ? String.join(", ", genres)
+                : "Không có thể loại"); // Chuỗi mặc định nếu thể loại trống
+
+        // Sử dụng Picasso để tải hình ảnh poster
+        Picasso.get().load(movie.getPoster()).into(holder.posterImage);
+
+        // Thiết lập sự kiện nhấp vào item
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, MovieDetailActivity.class);
+
+            // Truyền movie_id qua Intent
+            intent.putExtra("movie_id", movie.getMovieID());
+
+            // Khởi chạy MovieDetailActivity
+            context.startActivity(intent);
+        });
+    }
 
     @Override
     public int getItemCount() {
-        return movieList.size();
+        return (movieList != null) ? movieList.size() : 0;
     }
 
     public static class MovieViewHolder extends RecyclerView.ViewHolder {

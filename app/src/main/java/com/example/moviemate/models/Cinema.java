@@ -1,55 +1,55 @@
 package com.example.moviemate.models;
 
-import java.io.Serializable;
+import java.util.List;
 
-public class Cinema implements Serializable {
+public class Cinema {
+    private int CinemaID;
     private String CinemaName;
-    private String Address;
-    private String BrandLogo;
-    //private String Distance;
+    private String Address,BrandLogo;
+    private List<MovieShowtime> Movies;  // Liên kết tới danh sách các phim chiếu tại rạp và giờ chiếu
 
-    // Constructor mặc định không có tham số
+    // Constructor mặc định
     public Cinema() {
     }
 
-    // Constructor đầy đủ
-    public Cinema(String CinemaName, String Address, String BrandLogo) {
-        this.CinemaName = CinemaName;
-        this.Address = Address;
-        this.BrandLogo = BrandLogo;
-        //this.Distance = Distance;
+    // Getters và Setters
+    public int getCinemaID() {
+        return CinemaID;
     }
 
-    // Getters và Setters
+    public void setCinemaID(int cinemaID) {
+        CinemaID = cinemaID;
+    }
+
     public String getCinemaName() {
         return CinemaName;
     }
 
-    public void setCinemaName(String CinemaName) {
-        this.CinemaName = CinemaName;
+    public void setCinemaName(String cinemaName) {
+        CinemaName = cinemaName;
     }
 
     public String getAddress() {
         return Address;
     }
 
-    public void setAddress(String Address) {
-        this.Address = Address;
+    public void setAddress(String address) {
+        Address = address;
+    }
+
+    public List<MovieShowtime> getMovies() {
+        return Movies;
+    }
+
+    public void setMovies(List<MovieShowtime> movies) {
+        Movies = movies;
     }
 
     public String getBrandLogo() {
         return BrandLogo;
     }
 
-    public void setBrandLogo(String BrandLogo) {
-        this.BrandLogo = BrandLogo;
+    public void setBrandLogo(String brandLogo) {
+        BrandLogo = brandLogo;
     }
-
-//    public String getDistance() {
-//        return Distance;
-//    }
-//
-//    public void setDistance(String Distance) {
-//        this.Distance = Distance;
-//    }
 }

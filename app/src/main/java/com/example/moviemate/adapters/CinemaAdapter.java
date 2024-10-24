@@ -38,8 +38,21 @@ public class CinemaAdapter extends RecyclerView.Adapter<CinemaAdapter.CinemaView
         Cinema cinema = cinemaList.get(position);
         holder.cinemaName.setText(cinema.getCinemaName());
         holder.cinemaAddress.setText(cinema.getAddress());
-        //holder.cinemaDistance.setText(cinema.getDistance());
-        Picasso.get().load(cinema.getBrandLogo()).into(holder.cinemaLogo);  // Load cinema logo
+
+        // Load cinema logo using Picasso
+        Picasso.get().load(cinema.getBrandLogo()).into(holder.cinemaLogo);
+
+//        // Optional: Show the list of movies being played at the cinema
+//        StringBuilder movieInfo = new StringBuilder();
+//        if (cinema.getMovies() != null && !cinema.getMovies().isEmpty()) {
+//            for (int i = 0; i < cinema.getMovies().size(); i++) {
+//                movieInfo.append(cinema.getMovies().get(i).getMovieID()); // Thay MovieID bằng tiêu đề phim nếu cần
+//                if (i != cinema.getMovies().size() - 1) {
+//                    movieInfo.append(", ");
+//                }
+//            }
+//        }
+//        holder.cinemaMovies.setText(movieInfo.toString());
     }
 
     @Override
@@ -49,14 +62,14 @@ public class CinemaAdapter extends RecyclerView.Adapter<CinemaAdapter.CinemaView
 
     public static class CinemaViewHolder extends RecyclerView.ViewHolder {
         ImageView cinemaLogo;
-        TextView cinemaName, cinemaAddress, cinemaDistance;
+        TextView cinemaName, cinemaAddress, cinemaMovies;  // Thêm cinemaMovies để hiển thị danh sách phim
 
         public CinemaViewHolder(@NonNull View itemView) {
             super(itemView);
             cinemaLogo = itemView.findViewById(R.id.cinema_logo);
             cinemaName = itemView.findViewById(R.id.cinema_name);
             cinemaAddress = itemView.findViewById(R.id.cinema_address);
-            cinemaDistance = itemView.findViewById(R.id.cinema_distance);
+//            cinemaMovies = itemView.findViewById(R.id.cinema_movies); // Đảm bảo rằng cinema_movies có trong layout
         }
     }
 }
