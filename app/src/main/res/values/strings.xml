@@ -22,4 +22,9 @@
     <string name="or_continue_with">Or continue with</string>
     <string name="don_t_have_an_account_register">Don\'t have an account? Register</string>
     <string name="notice_need_read_terms">By sign in or sign up, you agree to our Terms of Service and Privacy Policy</string>
+    <string name="welcome">Welcome</string>
+    <string name="forgot_password_title">Forgot password</string>
+    <string name="reset_password">Reset password</string>
+    <string name="reset_password_inform">Please enter your email and we will send an link in the next step to reset your password.</string>
+    <string name="continue_string">Continue</string>
 </resources>
