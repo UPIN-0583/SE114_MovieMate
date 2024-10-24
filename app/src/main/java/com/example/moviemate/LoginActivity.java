@@ -2,7 +2,6 @@ package com.example.moviemate;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Button;
@@ -125,7 +124,7 @@ public class LoginActivity extends AppCompatActivity {
                 firebaseAuthWithGoogle(account.getIdToken());
             } catch (ApiException e) {
                 Log.w("LoginActivity", "Google sign in failed", e);
-                Toast.makeText(LoginActivity.this, "Google sign-in failed.", Toast.LENGTH_SHORT).show();
+                CustomDialog.showAlertDialog(LoginActivity.this, R.drawable.ic_error, "Error", "Google sign-in failed.", false);
             }
         }
     }
@@ -138,13 +137,13 @@ public class LoginActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         // Đăng nhập thành công, chuyển đến màn hình chính hoặc xử lý logic khác
                         FirebaseUser user = mAuth.getCurrentUser();
-                        Toast.makeText(LoginActivity.this, "Google sign-in successful.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Google sign-in successful", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
                         // Điều hướng sang màn hình khác
                     } else {
                         // Đăng nhập thất bại
-                        Toast.makeText(LoginActivity.this, "Google sign-in failed.", Toast.LENGTH_SHORT).show();
+                        CustomDialog.showAlertDialog(LoginActivity.this, R.drawable.ic_error, "Error", "Google sign-in failed.", false);
                     }
                 });
     }
