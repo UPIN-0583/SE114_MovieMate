@@ -28,11 +28,11 @@ import java.util.List;
 
 public class HomeFragment extends Fragment {
 
-    private RecyclerView bannerRecycler, topMoviesRecycler, upcomingMoviesRecycler;
+    private RecyclerView bannerRecycler, nowPlayingRecycler, comingSoonRecycler;
     private BannerAdapter bannerAdapter;
-    private MovieAdapter topMoviesAdapter, upcomingMoviesAdapter;
+    private MovieAdapter nowPlayingAdapter, comingSoonAdapter;
     private List<Banner> bannerList;
-    private List<Movie> topMoviesList, upcomingMoviesList;
+    private List<Movie> nowPlayingList, comingSoonList;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,32 +42,32 @@ public class HomeFragment extends Fragment {
 
         // Initialize RecyclerViews
         bannerRecycler = view.findViewById(R.id.banner_recycler);
-        topMoviesRecycler = view.findViewById(R.id.top_movies_recycler);
-        upcomingMoviesRecycler = view.findViewById(R.id.upcoming_movies_recycler);
+        nowPlayingRecycler = view.findViewById(R.id.now_playing_recycler);
+        comingSoonRecycler = view.findViewById(R.id.coming_soon_recycler);
 
         // Set layout managers for RecyclerViews
         bannerRecycler.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        topMoviesRecycler.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        upcomingMoviesRecycler.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        nowPlayingRecycler.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        comingSoonRecycler.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
         // Initialize lists and adapters
         bannerList = new ArrayList<>();
-        topMoviesList = new ArrayList<>();
-        upcomingMoviesList = new ArrayList<>();
+        nowPlayingList = new ArrayList<>();
+        comingSoonList = new ArrayList<>();
 
         bannerAdapter = new BannerAdapter(getContext(), bannerList);
-        topMoviesAdapter = new MovieAdapter(getContext(), topMoviesList);
-        upcomingMoviesAdapter = new MovieAdapter(getContext(), upcomingMoviesList);
+        nowPlayingAdapter = new MovieAdapter(getContext(), nowPlayingList);
+        comingSoonAdapter = new MovieAdapter(getContext(), comingSoonList);
 
         // Set adapters for RecyclerViews
         bannerRecycler.setAdapter(bannerAdapter);
-        topMoviesRecycler.setAdapter(topMoviesAdapter);
-        upcomingMoviesRecycler.setAdapter(upcomingMoviesAdapter);
+        nowPlayingRecycler.setAdapter(nowPlayingAdapter);
+        comingSoonRecycler.setAdapter(comingSoonAdapter);
 
         // Load data from Firebase
         loadBanners();
-        loadTopMovies();
-        loadUpcomingMovies();
+        loadNowPlayingMovies();
+        loadComingSoonMovies();
 
         return view;
     }
@@ -87,47 +87,47 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.w("DatabaseError", "loadBanner:onCancelled", databaseError.toException());
+                Log.w("DatabaseError", "loadBanners:onCancelled", databaseError.toException());
             }
         });
     }
 
-    private void loadTopMovies() {
-        DatabaseReference topMoviesRef = FirebaseDatabase.getInstance().getReference("Items");
-        topMoviesRef.addValueEventListener(new ValueEventListener() {
+    private void loadNowPlayingMovies() {
+        DatabaseReference nowPlayingRef = FirebaseDatabase.getInstance().getReference("Items");
+        nowPlayingRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                topMoviesList.clear();
+                nowPlayingList.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Movie movie = snapshot.getValue(Movie.class);
-                    topMoviesList.add(movie);
+                    nowPlayingList.add(movie);
                 }
-                topMoviesAdapter.notifyDataSetChanged();
+                nowPlayingAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.w("DatabaseError", "loadTopMovies:onCancelled", databaseError.toException());
+                Log.w("DatabaseError", "loadNowPlayingMovies:onCancelled", databaseError.toException());
             }
         });
     }
 
-    private void loadUpcomingMovies() {
-        DatabaseReference upcomingMoviesRef = FirebaseDatabase.getInstance().getReference("Upcomming");
-        upcomingMoviesRef.addValueEventListener(new ValueEventListener() {
+    private void loadComingSoonMovies() {
+        DatabaseReference comingSoonRef = FirebaseDatabase.getInstance().getReference("Upcomming");
+        comingSoonRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                upcomingMoviesList.clear();
+                comingSoonList.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Movie movie = snapshot.getValue(Movie.class);
-                    upcomingMoviesList.add(movie);
+                    comingSoonList.add(movie);
                 }
-                upcomingMoviesAdapter.notifyDataSetChanged();
+                comingSoonAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.w("DatabaseError", "loadUpcomingMovies:onCancelled", databaseError.toException());
+                Log.w("DatabaseError", "loadComingSoonMovies:onCancelled", databaseError.toException());
             }
         });
     }
