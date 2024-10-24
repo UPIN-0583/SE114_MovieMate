@@ -59,7 +59,6 @@ public class LoginActivity extends AppCompatActivity {
         registerLink.setOnClickListener(view -> {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
-            finish();
         });
 
         forgotPasswordLink.setOnClickListener(view -> {
@@ -97,7 +96,7 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
-                        // Điều hướng tới màn hình khác nếu cần
+                        finish(); // Prevent user from going back to login screen
                     } else {
                         CustomDialog.showAlertDialog(LoginActivity.this, R.drawable.ic_error, "Error", "Login failed: " + task.getException().getMessage(), false);
                     }
