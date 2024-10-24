@@ -18,4 +18,19 @@
         <!-- Màu nhấn khi tương tác -->
         <item name="colorSecondary">@color/yellow</item>
     </style>
+
+    <!-- Splash screen theme -->
+    <style name="Theme.MovieMate.Starting" parent="Theme.SplashScreen">
+        <!-- Màu nền của splash screen -->
+        <item name="windowSplashScreenBackground">@color/black</item>
+
+        <!-- Icon splash screen -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash</item>
+
+        <!-- Thời gian animation (ms) -->
+        <item name="windowSplashScreenAnimationDuration">10000</item>
+
+        <!-- Theme sau khi splash screen kết thúc -->
+        <item name="postSplashScreenTheme">@style/Theme.MovieMate</item>
+    </style>
 </resources>
