@@ -23,7 +23,7 @@ import java.util.Objects;
 
 public class PaymentActivity extends AppCompatActivity {
     PaymentMethodListAdapter paymentMethodListAdapter;
-    int basePrice;
+    Integer basePrice = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,16 +72,24 @@ public class PaymentActivity extends AppCompatActivity {
             return;
         }
 
-        int discountAmount = 100000;
-        // Do something with discount code
-
         TextView totalMoneyTextView = findViewById(R.id.totalMoneyTextView);
         String totalMoneyString = totalMoneyTextView.getText().toString();
         int totalMoney = parseMoney(totalMoneyString);
-        totalMoney -= discountAmount;
+
+        // Do not stack discount
+        if (basePrice != null && totalMoney != basePrice) {
+            totalMoney = basePrice;
+        }
+
+        int discountAmount = 100000;
+        // Calculate discount amount here
+
+        totalMoney += discountAmount;
         totalMoney = Math.max(totalMoney, 0); // Never show negative money
 
         totalMoneyTextView.setText(formatMoney(totalMoney));
+
+        CustomDialog.showAlertDialog(this, R.drawable.ic_success, "Success", "Discount code applied successfully", false);
     }
 
     private void pay() {
