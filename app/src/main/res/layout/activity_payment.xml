@@ -169,18 +169,31 @@
                 app:layout_constraintBottom_toTopOf="@+id/textView"
                 app:layout_constraintStart_toStartOf="parent" />
 
-            <TextView
-                android:id="@+id/totalMoneyTextView"
+            <LinearLayout
+                android:id="@+id/totalMoneyLayout"
                 android:layout_width="wrap_content"
+                android:orientation="horizontal"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
-                android:text="189.000 VND"
-                android:textSize="24sp"
-                android:textColor="@color/yellow"
-                android:fontFamily="@font/sf_pro"
-                app:layout_constraintBottom_toTopOf="@+id/textView"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/textView">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1"
+                    android:textColor="@color/yellow"
+                    android:fontFamily="@font/sf_pro"
+                    android:textSize="24sp"
+                    android:layout_marginEnd="2dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/vnd"
+                    android:textColor="@color/yellow"
+                    android:fontFamily="@font/sf_pro"
+                    android:textSize="24sp" />
+            </LinearLayout>
 
             <View
                 android:id="@+id/view"
@@ -190,7 +203,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
                 android:background="@color/soft_dark_gray"
-                app:layout_constraintBottom_toTopOf="@+id/totalMoneyTextView"
+                app:layout_constraintBottom_toTopOf="@+id/totalMoneyLayout"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
@@ -271,7 +284,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="8dp"
-                android:text="78889377726"
+                android:text="1000"
                 android:textAppearance="@style/text_label"
                 app:layout_constraintTop_toBottomOf="@id/paymentMovieBanner"
                 app:layout_constraintBottom_toTopOf="@+id/seatTextView"
