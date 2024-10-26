@@ -1,11 +1,13 @@
 package com.example.moviemate.activities;
 
 import android.os.Bundle;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -13,11 +15,15 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.moviemate.R;
 import com.example.moviemate.adapters.PaymentMethodListAdapter;
 import com.example.moviemate.models.PaymentMethod;
+import com.example.moviemate.utils.CustomDialog;
 
+import java.text.NumberFormat;
 import java.util.List;
 import java.util.Objects;
 
 public class PaymentActivity extends AppCompatActivity {
+    PaymentMethodListAdapter paymentMethodListAdapter;
+    int basePrice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,15 +36,78 @@ public class PaymentActivity extends AppCompatActivity {
             return insets;
         });
 
+        initPaymentMethods();
+        loadAndDisplayData();
+
+        Button applyDiscountCodeButton = findViewById(R.id.applyDiscountBtn);
+        applyDiscountCodeButton.setOnClickListener(v -> applyDiscountCode());
+
+        Button payButton = findViewById(R.id.payBtn);
+        payButton.setOnClickListener(v -> pay());
+    }
+
+    private void initPaymentMethods() {
         List<PaymentMethod> paymentMethods = List.of(
                 new PaymentMethod(PaymentMethod.TYPE.ZALO_PAY, "Zalo Pay", R.drawable.logo_zalopay),
                 new PaymentMethod(PaymentMethod.TYPE.MOMO, "MoMo", R.drawable.logo_momo),
                 new PaymentMethod(PaymentMethod.TYPE.QR_CODE, "QR Code", R.drawable.logo_qrcode)
         );
 
-        PaymentMethodListAdapter adapter = new PaymentMethodListAdapter(this, R.layout.payment_method_item, paymentMethods);
+        paymentMethodListAdapter = new PaymentMethodListAdapter(this, R.layout.payment_method_item, paymentMethods);
 
         ListView paymentMethodListView = findViewById(R.id.paymentMethodListView);
-        paymentMethodListView.setAdapter(adapter);
+        paymentMethodListView.setAdapter(paymentMethodListAdapter);
+    }
+
+    private void loadAndDisplayData() {
+        // Put code to load data here
+    }
+
+    private void applyDiscountCode() {
+        EditText discountCodeEditText = findViewById(R.id.discountCodeEdit);
+        String discountCode = discountCodeEditText.getText().toString().trim();
+
+        if (discountCode.isEmpty()) {
+            CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Error", "Please enter discount code", false);
+            return;
+        }
+
+        int discountAmount = 100000;
+        // Do something with discount code
+
+        TextView totalMoneyTextView = findViewById(R.id.totalMoneyTextView);
+        String totalMoneyString = totalMoneyTextView.getText().toString();
+        int totalMoney = parseMoney(totalMoneyString);
+        totalMoney -= discountAmount;
+        totalMoney = Math.max(totalMoney, 0); // Never show negative money
+
+        totalMoneyTextView.setText(formatMoney(totalMoney));
+    }
+
+    private void pay() {
+        // Put code to pay here
+    }
+
+    private int parseMoney(String moneyString) {
+        NumberFormat formatter = NumberFormat.getInstance();
+
+        try {
+            Number number = formatter.parse(moneyString);
+            return Objects.requireNonNull(number).intValue();
+        } catch (Exception e) {
+            CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Error", "Invalid money format", false);
+            return basePrice;
+        }
+    }
+
+    private String formatMoney(int money) {
+        NumberFormat formatter = NumberFormat.getInstance();
+
+        try {
+            return formatter.format(money);
+        } catch (Exception e) {
+            CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Error", "Invalid money format", false);
+            return formatter.format(basePrice);
+        }
     }
 }
