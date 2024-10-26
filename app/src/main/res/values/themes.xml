@@ -6,6 +6,7 @@
 
         <!-- Màu chữ và biểu tượng (Icon và Text color) -->
         <item name="android:textColor">@color/white</item>
+        <item name="android:editTextColor">@color/white</item>
 
         <!-- Màu chính (primary) là nút Sign in màu vàng -->
         <item name="colorPrimary">@color/yellow</item>
