@@ -144,7 +144,14 @@ public class PaymentActivity extends AppCompatActivity {
         paymentMethodListView.setAdapter(paymentMethodListAdapter);
     }
     private void pay() {
+        PaymentMethod paymentMethod = paymentMethodListAdapter.getSelectedPaymentMethod();
+        if (paymentMethod == null) {
+            CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Error", "Please select a payment method", false);
+            return;
+        }
 
+        // Perform payment here
+        CustomDialog.showAlertDialog(this, R.drawable.ic_success, "Success", "Payment successful", false);
     }
     private void cancelPayment(String reason) {
         if (paymentTimer != null) {
