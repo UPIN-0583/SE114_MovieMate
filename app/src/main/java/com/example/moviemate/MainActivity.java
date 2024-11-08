@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.moviemate.fragments.HomeFragment;
 import com.example.moviemate.fragments.MovieFragment;
+import com.example.moviemate.fragments.ProfileFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -41,9 +42,9 @@ public class MainActivity extends AppCompatActivity {
                 else if (item.getItemId() == R.id.nav_movie) {
                     selectedFragment = new MovieFragment();
                 }
-//                } else if (item.getItemId() == R.id.nav_profile) {
-//                    selectedFragment = new ProfileFragment();
-//                }
+                 else if (item.getItemId() == R.id.nav_profile) {
+                    selectedFragment = new ProfileFragment();
+                }
 
 
                 getSupportFragmentManager().beginTransaction()

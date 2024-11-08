@@ -4,43 +4,73 @@ import java.io.Serializable;
 import java.util.Map;
 
 public class ShowTime implements Serializable {
-    private String Time;  // Thời gian chiếu
-    private int Price;    // Giá vé
-    private Map<String, String> Seats;  // Trạng thái ghế (VD: "A1": "available")
+    private String showTimeID;  // ID của suất chiếu
+    private Integer movieID;    // ID của phim
+    private Long price;         // Giá vé
+    private Map<String, String> seats;  // Trạng thái ghế (ví dụ: "A1": "available")
+    private String time;        // Giờ chiếu
+    private String day;         // Ngày chiếu
 
     // Constructor mặc định
     public ShowTime() {
     }
 
     // Constructor đầy đủ để khởi tạo ShowTime
-    public ShowTime(String time, int price, Map<String, String> seats) {
-        this.Time = time;
-        this.Price = price;
-        this.Seats = seats;
+    public ShowTime(String showTimeID, Integer movieID, Long price, Map<String, String> seats, String time, String day) {
+        this.showTimeID = showTimeID;
+        this.movieID = movieID;
+        this.price = price;
+        this.seats = seats;
+        this.time = time;
+        this.day = day;
     }
 
     // Getters và Setters
-    public String getTime() {
-        return Time;
+    public String getShowTimeID() {
+        return showTimeID;
     }
 
-    public void setTime(String time) {
-        Time = time;
+    public void setShowTimeID(String showTimeID) {
+        this.showTimeID = showTimeID;
     }
 
-    public int getPrice() {
-        return Price;
+    public Integer getMovieID() {
+        return movieID;
     }
 
-    public void setPrice(int price) {
-        Price = price;
+    public void setMovieID(Integer movieID) {
+        this.movieID = movieID;
+    }
+
+    public Long getPrice() {
+        return price;
+    }
+
+    public void setPrice(Long price) {
+        this.price = price;
     }
 
     public Map<String, String> getSeats() {
-        return Seats;
+        return seats;
     }
 
     public void setSeats(Map<String, String> seats) {
-        Seats = seats;
+        this.seats = seats;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public String getDay() {
+        return day;
+    }
+
+    public void setDay(String day) {
+        this.day = day;
     }
 }

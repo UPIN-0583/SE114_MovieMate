@@ -9,6 +9,10 @@
     <color name="selected_item_color">#FFD700</color> <!-- Vàng cho mục được chọn -->
     <color name="unselected_item_color">#FFFFFF</color> <!-- Trắng cho mục không được chọn -->
 
+    <color name="available_seat">#1C1C1C</color>
+    <color name="reserved_seat">#000000</color>
+    <color name="selected_seat">#FCC434</color>
+
     <color name="black">#000000</color>
     <color name="white">#F2F2F2</color>
     <color name="black2">#1A1A1A</color>

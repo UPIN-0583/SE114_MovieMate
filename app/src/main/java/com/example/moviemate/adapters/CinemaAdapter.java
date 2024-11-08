@@ -20,10 +20,17 @@ public class CinemaAdapter extends RecyclerView.Adapter<CinemaAdapter.CinemaView
 
     private Context context;
     private List<Cinema> cinemaList;
+    private OnCinemaSelectedListener listener;
+    private int selectedPosition = RecyclerView.NO_POSITION; // Vị trí rạp được chọn
 
-    public CinemaAdapter(Context context, List<Cinema> cinemaList) {
+    public CinemaAdapter(Context context, List<Cinema> cinemaList, OnCinemaSelectedListener listener) {
         this.context = context;
         this.cinemaList = cinemaList;
+        this.listener = listener;
+    }
+
+    public interface OnCinemaSelectedListener {
+        void onCinemaSelected(Cinema cinema);
     }
 
     @NonNull
@@ -42,17 +49,16 @@ public class CinemaAdapter extends RecyclerView.Adapter<CinemaAdapter.CinemaView
         // Load cinema logo using Picasso
         Picasso.get().load(cinema.getBrandLogo()).into(holder.cinemaLogo);
 
-//        // Optional: Show the list of movies being played at the cinema
-//        StringBuilder movieInfo = new StringBuilder();
-//        if (cinema.getMovies() != null && !cinema.getMovies().isEmpty()) {
-//            for (int i = 0; i < cinema.getMovies().size(); i++) {
-//                movieInfo.append(cinema.getMovies().get(i).getMovieID()); // Thay MovieID bằng tiêu đề phim nếu cần
-//                if (i != cinema.getMovies().size() - 1) {
-//                    movieInfo.append(", ");
-//                }
-//            }
-//        }
-//        holder.cinemaMovies.setText(movieInfo.toString());
+        // Highlight selected item
+        holder.itemView.setSelected(position == selectedPosition);
+
+        holder.itemView.setOnClickListener(v -> {
+            selectedPosition = holder.getAdapterPosition();
+            notifyDataSetChanged();  // Cập nhật lại hiển thị cho các rạp
+            if (listener != null) {
+                listener.onCinemaSelected(cinema);
+            }
+        });
     }
 
     @Override
@@ -62,14 +68,13 @@ public class CinemaAdapter extends RecyclerView.Adapter<CinemaAdapter.CinemaView
 
     public static class CinemaViewHolder extends RecyclerView.ViewHolder {
         ImageView cinemaLogo;
-        TextView cinemaName, cinemaAddress, cinemaMovies;  // Thêm cinemaMovies để hiển thị danh sách phim
+        TextView cinemaName, cinemaAddress;
 
         public CinemaViewHolder(@NonNull View itemView) {
             super(itemView);
             cinemaLogo = itemView.findViewById(R.id.cinema_logo);
             cinemaName = itemView.findViewById(R.id.cinema_name);
             cinemaAddress = itemView.findViewById(R.id.cinema_address);
-//            cinemaMovies = itemView.findViewById(R.id.cinema_movies); // Đảm bảo rằng cinema_movies có trong layout
         }
     }
 }

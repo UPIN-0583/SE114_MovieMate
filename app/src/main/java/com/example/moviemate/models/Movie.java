@@ -2,22 +2,23 @@ package com.example.moviemate.models;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 public class Movie implements Serializable {
-    private int MovieID;          // ID của phim
-    private String Title;         // Tiêu đề phim
-    private String Description;   // Mô tả phim
-    private String Poster;        // URL poster phim
-    private String Trailer;       // URL trailer phim
-    private String Language;      // Ngôn ngữ
-    private String Rating;        // Đánh giá độ tuổi
-    private double Imdb;          // Đánh giá IMDb
-    private String Time;          // Thời lượng phim
-    private int Year;             // Năm phát hành
-    private String Status;        // Trạng thái (Now Playing, Coming Soon)
-    private List<Person> Actor;   // Danh sách diễn viên
-    private List<Person> Director; // Danh sách đạo diễn
-    private List<String> Genre;   // Danh sách thể loại phim
+    private int MovieID;
+    private String Title;
+    private String Description;
+    private String Poster;
+    private String Trailer;
+    private String Language;
+    private String Rating;
+    private double Imdb;
+    private String Time;
+    private int Year;
+    private String Status;
+    private List<Person> Actor;
+    private List<Person> Director;
+    private List<String> Genre;
 
     // Constructor mặc định
     public Movie() {
@@ -26,7 +27,7 @@ public class Movie implements Serializable {
     // Constructor đầy đủ
     public Movie(int movieID, String title, String description, String poster, String trailer,
                  String language, String rating, double imdb, String time, int year,
-                 String status, List<Person> actor, List<Person> director, List<String> genre) {
+                 String status, List<Person> actor, List<Person> director, List<String> genre, Map<String, Map<String, ShowTime>> showTimes) {
         this.MovieID = movieID;
         this.Title = title;
         this.Description = description;
@@ -155,4 +156,6 @@ public class Movie implements Serializable {
     public void setGenre(List<String> genre) {
         Genre = genre;
     }
+
+
 }

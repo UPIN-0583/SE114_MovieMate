@@ -1,0 +1,111 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#3b221f">
+
+    <!-- Back Button -->
+    <ImageView
+        android:id="@+id/back_button"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_alignParentStart="true"
+        android:src="@drawable/ic_back"
+        />
+
+    <!-- Title -->
+    <TextView
+        android:id="@+id/select_date_time_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Date and Time"
+        android:textColor="#FFFFFF"
+        android:layout_centerHorizontal="true"
+        android:textSize="18sp"
+        android:layout_marginTop="16dp" />
+
+    <!-- Date RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/date_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_below="@id/select_date_time_title"
+        android:layout_marginTop="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:orientation="horizontal"
+        android:background="@drawable/rounded_background_dark" />
+
+    <!-- Time RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/time_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_below="@id/date_recycler_view"
+        android:layout_marginTop="8dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:orientation="horizontal"
+        android:background="@drawable/rounded_background_dark" />
+
+    <!-- Seat Selection Title -->
+    <TextView
+        android:id="@+id/select_seat_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Seat"
+        android:textColor="#FFFFFF"
+        android:layout_below="@id/time_recycler_view"
+        android:layout_centerHorizontal="true"
+        android:textSize="18sp"
+        android:layout_marginTop="24dp" />
+
+    <!-- Seat Grid Layout -->
+    <GridLayout
+        android:id="@+id/seat_grid_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_below="@id/select_seat_title"
+        android:layout_above="@id/bottom_section"
+        android:columnCount="13"
+        android:padding="8dp"
+        android:layout_marginTop="8dp">
+        <!-- Seats are generated programmatically in the GridLayout -->
+    </GridLayout>
+
+    <!-- Bottom Section: Total Price and Purchase Button -->
+    <LinearLayout
+        android:id="@+id/bottom_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_alignParentBottom="true"
+        android:background="#3b221f"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/total_price"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Total: 0 VND"
+            android:textSize="16sp"
+            android:textColor="#FFD700"
+            android:layout_marginEnd="16dp" />
+
+        <Button
+            android:id="@+id/buy_ticket_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Buy Ticket"
+            android:backgroundTint="#FFD700"
+            android:textColor="#000000"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:textStyle="bold"
+            android:layout_gravity="end"/>
+    </LinearLayout>
+
+</RelativeLayout>
