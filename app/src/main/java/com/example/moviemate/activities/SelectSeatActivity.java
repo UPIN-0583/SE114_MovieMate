@@ -1,7 +1,6 @@
 package com.example.moviemate.activities;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.TextView;
@@ -14,12 +13,21 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.moviemate.R;
 import com.example.moviemate.adapters.DayTimeAdapter;
-import com.example.moviemate.models.ShowTime;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.journeyapps.barcodescanner.BarcodeEncoder;
+import com.google.zxing.BarcodeFormat;
+
+import android.graphics.Bitmap;
+import java.io.ByteArrayOutputStream;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,13 +44,16 @@ public class SelectSeatActivity extends AppCompatActivity {
     private DayTimeAdapter dateAdapter, timeAdapter;
     private List<String> dateList = new ArrayList<>();
     private List<String> timeList = new ArrayList<>();
+    private List<String> selectedSeats = new ArrayList<>(); // Danh sách ghế đã chọn
 
     private String selectedDate;
     private String selectedTime;
     private int totalPrice = 0;
-    private Map<String, String> seatMap; // Giữ trạng thái các ghế
+    private int seatPrice = 0; // Giá vé
 
+    private Map<String, String> seatMap;
     private DatabaseReference cinemaRef;
+    private DatabaseReference userTicketsRef;
     private String cinemaID;
     private int movieID;
 
@@ -62,26 +73,27 @@ public class SelectSeatActivity extends AppCompatActivity {
         totalPriceTextView = findViewById(R.id.total_price);
         buyTicketButton = findViewById(R.id.buy_ticket_button);
 
-        // Thiết lập RecyclerView cho ngày và giờ
         dateRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         timeRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+
+        userTicketsRef = FirebaseDatabase.getInstance().getReference("Users")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Tickets");
 
         fetchShowTimesFromFirebase();
 
         // Sự kiện khi nhấn nút "Mua vé"
         buyTicketButton.setOnClickListener(v -> {
-            if (selectedDate == null || selectedTime == null) {
-                Toast.makeText(this, "Hãy chọn ngày và giờ", Toast.LENGTH_SHORT).show();
+            if (selectedDate == null || selectedTime == null || selectedSeats.isEmpty()) {
+                Toast.makeText(this, "Hãy chọn ngày, giờ và ít nhất một ghế", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "Đặt vé thành công! Tổng cộng: " + totalPrice + " VND", Toast.LENGTH_SHORT).show();
-                // Xử lý thanh toán tại đây
+                saveTicketToFirebase();
             }
         });
     }
 
     private void fetchShowTimesFromFirebase() {
         cinemaRef = FirebaseDatabase.getInstance().getReference("Cinemas")
-                .child(cinemaID) // Đảm bảo cinemaID được truyền đúng
+                .child(cinemaID)
                 .child("Movies")
                 .child("Movie" + movieID)
                 .child("ShowTimes");
@@ -96,7 +108,7 @@ public class SelectSeatActivity extends AppCompatActivity {
                         dateList.add(date); // Thêm từng ngày vào danh sách
                     }
                 }
-                setupDateAdapter(); // Gọi cập nhật adapter sau khi lấy dữ liệu xong
+                setupDateAdapter();
             }
 
             @Override
@@ -112,9 +124,8 @@ public class SelectSeatActivity extends AppCompatActivity {
             fetchTimesForSelectedDate(date);
         });
         dateRecyclerView.setAdapter(dateAdapter);
-        dateAdapter.notifyDataSetChanged(); // Cập nhật RecyclerView
+        dateAdapter.notifyDataSetChanged();
     }
-
 
     private void fetchTimesForSelectedDate(String date) {
         cinemaRef.child(date).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -146,18 +157,23 @@ public class SelectSeatActivity extends AppCompatActivity {
     }
 
     private void fetchSeatsForSelectedTime(String date, String time) {
-        cinemaRef.child(date).child(time).child("Seats").addListenerForSingleValueEvent(new ValueEventListener() {
+        cinemaRef.child(date).child(time).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                seatMap = new HashMap<>();  // Khởi tạo lại seatMap để đảm bảo nó không null
-                for (DataSnapshot seatSnapshot : snapshot.getChildren()) {
+                seatMap = new HashMap<>();
+                Integer priceFromDb = snapshot.child("Price").getValue(Integer.class);
+                if (priceFromDb != null) {
+                    seatPrice = priceFromDb;
+                }
+
+                for (DataSnapshot seatSnapshot : snapshot.child("Seats").getChildren()) {
                     String seatKey = seatSnapshot.getKey();
                     String seatStatus = seatSnapshot.getValue(String.class);
                     if (seatKey != null && seatStatus != null) {
                         seatMap.put(seatKey, seatStatus);
                     }
                 }
-                setupSeatGrid();  // Hiển thị ghế sau khi đã lấy dữ liệu từ Firebase
+                setupSeatGrid();
             }
 
             @Override
@@ -168,7 +184,6 @@ public class SelectSeatActivity extends AppCompatActivity {
     }
 
     private void setupSeatGrid() {
-        // Kiểm tra nếu seatMap không phải là null
         if (seatMap != null && !seatMap.isEmpty()) {
             seatGridLayout.removeAllViews();
             for (Map.Entry<String, String> entry : seatMap.entrySet()) {
@@ -180,7 +195,7 @@ public class SelectSeatActivity extends AppCompatActivity {
                 seatTextView.setPadding(16, 16, 16, 16);
 
                 GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-                params.setMargins(16, 16, 16, 16);  // Đặt margin cho TextView
+                params.setMargins(16, 16, 16, 16);
                 seatTextView.setLayoutParams(params);
 
                 seatTextView.setBackgroundResource(status.equals("available") ? R.color.available_seat : R.color.reserved_seat);
@@ -196,22 +211,99 @@ public class SelectSeatActivity extends AppCompatActivity {
                 seatGridLayout.addView(seatTextView);
             }
         } else {
-            // Xử lý khi seatMap là null hoặc không có ghế nào
             Toast.makeText(this, "Không có thông tin ghế khả dụng", Toast.LENGTH_SHORT).show();
         }
     }
-
 
     private void toggleSeatSelection(TextView seatTextView, String seat) {
         if (seatTextView.isSelected()) {
             seatTextView.setSelected(false);
             seatTextView.setBackgroundResource(R.color.available_seat);
-            totalPrice -= 210000;
+            totalPrice -= seatPrice;
+            selectedSeats.remove(seat);
+            seatMap.put(seat, "available");
         } else {
             seatTextView.setSelected(true);
             seatTextView.setBackgroundResource(R.color.selected_seat);
-            totalPrice += 210000;
+            totalPrice += seatPrice;
+            selectedSeats.add(seat);
+            seatMap.put(seat, "selected");
         }
         totalPriceTextView.setText("Total: " + totalPrice + " VND");
     }
+
+
+    private void saveTicketToFirebase() {
+        String ticketId = userTicketsRef.push().getKey(); // Sử dụng TicketID làm mã định danh duy nhất cho vé
+        Map<String, Object> ticketData = new HashMap<>();
+        ticketData.put("cinema", cinemaID);
+        ticketData.put("movie", "Movie" + movieID);
+        ticketData.put("date", selectedDate);
+        ticketData.put("time", selectedTime);
+        ticketData.put("seats", selectedSeats);
+        ticketData.put("totalPrice", totalPrice);
+        ticketData.put("TicketID", ticketId);  // Lưu TicketID
+
+        Bitmap barcodeBitmap = createBarcode(ticketId);  // Tạo mã vạch từ TicketID
+        if (barcodeBitmap != null) {
+            uploadBarcodeToFirebase(barcodeBitmap, ticketId, ticketData);
+        } else {
+            Toast.makeText(this, "Không thể tạo mã vạch", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // Hàm tạo mã vạch từ TicketID
+    private Bitmap createBarcode(String ticketId) {
+        try {
+            BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+            return barcodeEncoder.encodeBitmap(ticketId, BarcodeFormat.CODE_128, 600, 300);
+        } catch(Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    // Hàm tải mã vạch lên Firebase Storage và lưu URL vào Database
+    private void uploadBarcodeToFirebase(Bitmap barcodeBitmap, String ticketId, Map<String, Object> ticketData) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReference().child("barcodes/" + ticketId + ".png");
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        barcodeBitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        byte[] data = baos.toByteArray();
+
+        UploadTask uploadTask = storageRef.putBytes(data);
+        uploadTask.addOnSuccessListener(taskSnapshot -> storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+            ticketData.put("BarcodeImage", uri.toString());  // Lưu URL mã vạch vào dữ liệu vé
+
+            // Lưu dữ liệu vé vào Firebase Realtime Database
+            userTicketsRef.child(ticketId).setValue(ticketData)
+                    .addOnSuccessListener(aVoid -> {
+                        updateSeatStatus();
+                        Toast.makeText(this, "Đặt vé thành công! Tổng cộng: " + totalPrice + " VND", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e -> Toast.makeText(this, "Lỗi khi lưu vé", Toast.LENGTH_SHORT).show());
+        })).addOnFailureListener(e -> {
+            Toast.makeText(this, "Lỗi khi tải mã vạch", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    private void updateSeatStatus() {
+        DatabaseReference seatsRef = FirebaseDatabase.getInstance().getReference("Cinemas")
+                .child(cinemaID)
+                .child("Movies")
+                .child("Movie" + movieID)
+                .child("ShowTimes")
+                .child(selectedDate)
+                .child(selectedTime)
+                .child("Seats");
+
+        for (String seat : selectedSeats) {
+            seatsRef.child(seat).setValue("booked")
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this, "Lỗi khi cập nhật trạng thái ghế", Toast.LENGTH_SHORT).show();
+                    });
+        }
+    }
+
 }

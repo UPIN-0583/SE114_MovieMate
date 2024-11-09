@@ -10,21 +10,23 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+
+import com.example.moviemate.models.User;
 import com.example.moviemate.utils.CustomDialog;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class RegisterActivity extends AppCompatActivity {
 
     private EditText emailField, passwordField, confirmPasswordField;
     private Button registerButton;
     private FirebaseAuth mAuth;
+    private DatabaseReference database;
 
     private boolean passwordVisible = false;
     private ImageButton passwordVisibilityBtn;
@@ -36,6 +38,7 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         mAuth = FirebaseAuth.getInstance();
+        database = FirebaseDatabase.getInstance().getReference("Users");
 
         emailField = findViewById(R.id.register_email);
         passwordField = findViewById(R.id.register_password);
@@ -104,7 +107,18 @@ public class RegisterActivity extends AppCompatActivity {
                 .addOnCompleteListener(task -> {
                     registerButton.setEnabled(true);
                     if (task.isSuccessful()) {
-                        CustomDialog.showAlertDialog(RegisterActivity.this, R.drawable.ic_success, "Success", "Registration successful", true);
+                        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                        if (firebaseUser != null) {
+                            String uid = firebaseUser.getUid();
+                            User user = new User(null, null, email, null); // Khởi tạo User với avatarUrl là null
+
+                            database.child(uid).setValue(user)
+                                    .addOnSuccessListener(aVoid -> {
+                                        CustomDialog.showAlertDialog(RegisterActivity.this, R.drawable.ic_success, "Success", "Registration successful", true);
+                                        finish(); // Đóng Activity sau khi đăng ký thành công
+                                    })
+                                    .addOnFailureListener(e -> Toast.makeText(RegisterActivity.this, "Lưu thông tin thất bại", Toast.LENGTH_SHORT).show());
+                        }
                     } else {
                         CustomDialog.showAlertDialog(RegisterActivity.this, R.drawable.ic_error, "Error", task.getException().getMessage(), false);
                     }
