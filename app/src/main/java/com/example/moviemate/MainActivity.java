@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
                 else if (item.getItemId() == R.id.nav_movie) {
                     selectedFragment = new MovieFragment();
                 }
-                 else if (item.getItemId() == R.id.nav_profile) {
+                else if (item.getItemId() == R.id.nav_profile) {
                     selectedFragment = new ProfileFragment();
                 }
 

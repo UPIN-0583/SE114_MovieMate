@@ -8,7 +8,6 @@
 
     <color name="selected_item_color">#FFD700</color> <!-- Vàng cho mục được chọn -->
     <color name="unselected_item_color">#FFFFFF</color> <!-- Trắng cho mục không được chọn -->
-
     <color name="available_seat">#1C1C1C</color>
     <color name="reserved_seat">#000000</color>
     <color name="selected_seat">#FCC434</color>
@@ -22,6 +21,7 @@
     <color name="dark_yellow">#261D08</color>
     <color name="dark_gray">#1c1c1c</color>
     <color name="soft_dark_gray">#595959</color>
+
 
     <color name="text_hint">#99FFFFFF</color>
 </resources>
