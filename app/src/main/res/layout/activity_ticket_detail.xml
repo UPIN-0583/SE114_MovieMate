@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.TicketDetailActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/ticket_background_detail"
+            android:padding="16dp">
+
+            <!-- Poster phim và tên phim -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingBottom="16dp">
+
+                <ImageView
+                    android:id="@+id/detail_movie_poster"
+                    android:layout_width="100dp"
+                    android:layout_height="150dp"
+                    android:scaleType="centerCrop"
+                    android:layout_marginEnd="16dp" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/detail_movie_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Avengers: Infinity War"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white" />
+
+                    <TextView
+                        android:id="@+id/detail_movie_duration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="2 hours 29 minutes"
+                        android:textColor="@android:color/darker_gray"
+                        android:drawableLeft="@drawable/ic_clock"
+                        android:drawablePadding="4dp"
+                        android:layout_marginTop="8dp" />
+
+                    <TextView
+                        android:id="@+id/detail_movie_genre"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Action, adventure, sci-fi"
+                        android:textColor="@android:color/darker_gray"
+                        android:drawableLeft="@drawable/ic_genre"
+                        android:drawablePadding="4dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Thông tin chi tiết về thời gian chiếu và vị trí ghế -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/detail_show_time"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="14h15' • 10.12.2022"
+                    android:textColor="@android:color/white"
+                    android:drawableLeft="@drawable/ic_calendar"
+                    android:drawablePadding="4dp" />
+
+                <TextView
+                    android:id="@+id/detail_seat_info"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Section 4\nSeat H7, H8"
+                    android:textColor="@android:color/white"
+                    android:gravity="center"
+                    android:drawableLeft="@drawable/ic_seat"
+                    android:drawablePadding="4dp" />
+            </LinearLayout>
+
+            <!-- Giá vé và địa điểm rạp -->
+            <TextView
+                android:id="@+id/detail_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="210.000 VND"
+                android:textColor="@android:color/white"
+                android:drawableLeft="@drawable/ic_money"
+                android:drawablePadding="4dp"
+                android:layout_marginTop="16dp" />
+
+            <TextView
+                android:id="@+id/detail_cinema_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Vincom Ocean Park"
+                android:textColor="@android:color/white"
+                android:drawableLeft="@drawable/ic_location"
+                android:drawablePadding="4dp"
+                android:layout_marginTop="8dp" />
+
+            <TextView
+                android:id="@+id/detail_cinema_address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="4th floor, Vincom Ocean Park, Da Ton, Gia Lam, Ha Noi"
+                android:textColor="@android:color/darker_gray"
+                android:layout_marginTop="4dp" />
+
+            <!-- Thông báo và mã vạch -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Show this QR code to the ticket counter to receive your ticket"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="16dp" />
+
+            <ImageView
+                android:id="@+id/detail_barcode"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:scaleType="fitCenter"
+                android:layout_marginTop="8dp" />
+
+            <TextView
+                android:id="@+id/detail_order_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Order ID: 78889377726"
+                android:textColor="@android:color/darker_gray"
+                android:gravity="center_horizontal"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>
