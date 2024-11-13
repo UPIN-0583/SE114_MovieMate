@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="Movie Title"
-            android:textColor="#FFFFFF" />
+            android:textColor="#FFD700" />
 
         <TextView
             android:id="@+id/movie_time"

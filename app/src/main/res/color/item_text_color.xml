@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Màu chữ khi item được chọn -->
+    <item android:state_selected="true" android:color="#000000" /> <!-- Màu đen khi chọn -->
+    <!-- Màu chữ khi item không được chọn -->
+    <item android:color="#FFFFFF" /> <!-- Màu trắng khi không chọn -->
+</selector>

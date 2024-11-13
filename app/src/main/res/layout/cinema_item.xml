@@ -2,15 +2,19 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="8dp">
+    android:padding="8dp"
+    android:background="?android:attr/selectableItemBackground"
+    android:id="@+id/cinema_container">
 
-    <ImageView
+        <ImageView
         android:id="@+id/cinema_logo"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginEnd="16dp" />
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="10dp"
+            />
 
-    <LinearLayout
+        <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -20,17 +24,21 @@
             android:id="@+id/cinema_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:text="Cinema Name"
+            android:layout_marginTop="8dp"
+            />
 
         <TextView
             android:id="@+id/cinema_address"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:id="@+id/cinema_distance"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@android:color/darker_gray" />
+            android:textColor="#CCCCCC"
+            android:text="Cinema Address"
+            android:layout_marginTop="5dp"
+            />
+
+
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>

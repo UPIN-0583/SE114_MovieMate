@@ -3,6 +3,7 @@ package com.example.moviemate.activities;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.GridLayout;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,7 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.moviemate.R;
-import com.example.moviemate.adapters.DayTimeAdapter;
+import com.example.moviemate.adapters.DayAdapter;
+import com.example.moviemate.adapters.TimeAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -36,12 +38,14 @@ import java.util.Map;
 
 public class SelectSeatActivity extends AppCompatActivity {
 
+    private ImageButton backBtn;
     private RecyclerView dateRecyclerView, timeRecyclerView;
     private GridLayout seatGridLayout;
     private TextView totalPriceTextView;
     private Button buyTicketButton;
 
-    private DayTimeAdapter dateAdapter, timeAdapter;
+    private DayAdapter dayAdapter;
+    private TimeAdapter timeAdapter;
     private List<String> dateList = new ArrayList<>();
     private List<String> timeList = new ArrayList<>();
     private List<String> selectedSeats = new ArrayList<>(); // Danh sách ghế đã chọn
@@ -67,6 +71,7 @@ public class SelectSeatActivity extends AppCompatActivity {
         movieID = getIntent().getIntExtra("movie_id", -1);
 
         // Ánh xạ các view
+        backBtn = findViewById(R.id.BackBtn);
         dateRecyclerView = findViewById(R.id.date_recycler_view);
         timeRecyclerView = findViewById(R.id.time_recycler_view);
         seatGridLayout = findViewById(R.id.seat_grid_layout);
@@ -81,6 +86,7 @@ public class SelectSeatActivity extends AppCompatActivity {
 
         fetchShowTimesFromFirebase();
 
+        backBtn.setOnClickListener(v -> finish());
         // Sự kiện khi nhấn nút "Mua vé"
         buyTicketButton.setOnClickListener(v -> {
             if (selectedDate == null || selectedTime == null || selectedSeats.isEmpty()) {
@@ -119,12 +125,12 @@ public class SelectSeatActivity extends AppCompatActivity {
     }
 
     private void setupDateAdapter() {
-        dateAdapter = new DayTimeAdapter(this, dateList, date -> {
+        dayAdapter = new DayAdapter(this, dateList, date -> {
             selectedDate = date;
             fetchTimesForSelectedDate(date);
         });
-        dateRecyclerView.setAdapter(dateAdapter);
-        dateAdapter.notifyDataSetChanged();
+        dateRecyclerView.setAdapter(dayAdapter);
+        dayAdapter.notifyDataSetChanged();
     }
 
     private void fetchTimesForSelectedDate(String date) {
@@ -149,7 +155,7 @@ public class SelectSeatActivity extends AppCompatActivity {
     }
 
     private void setupTimeAdapter() {
-        timeAdapter = new DayTimeAdapter(this, timeList, time -> {
+        timeAdapter = new TimeAdapter(this, timeList, time -> {
             selectedTime = time;
             fetchSeatsForSelectedTime(selectedDate, time);
         });
@@ -256,7 +262,7 @@ public class SelectSeatActivity extends AppCompatActivity {
     private Bitmap createBarcode(String ticketId) {
         try {
             BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-            return barcodeEncoder.encodeBitmap(ticketId, BarcodeFormat.CODE_128, 600, 300);
+            return barcodeEncoder.encodeBitmap(ticketId, BarcodeFormat.CODE_128, 600, 200);
         } catch(Exception e) {
             e.printStackTrace();
             return null;

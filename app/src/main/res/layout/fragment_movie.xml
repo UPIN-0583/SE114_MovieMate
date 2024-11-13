@@ -2,14 +2,27 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    >
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#333333"
-        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar" />
+        android:contentDescription="Tab layout for selecting movie categories"
+        app:tabIndicatorHeight="0dp"
+        app:tabBackground="@drawable/tab_background_selector"
+        app:tabTextColor="#FFFFFF"
+        app:tabSelectedTextColor="#000000"
+        app:tabMode="fixed"
+        android:background="@drawable/tab_background_selector"
+        app:tabGravity="fill"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="10dp"
+        android:textStyle="bold"
+    />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/view_pager"

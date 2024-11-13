@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:paddingTop="15dp"
+    android:paddingBottom="5dp"
+    android:paddingHorizontal="5dp"
+    android:layout_margin="8dp"
+    android:background="@drawable/item_day_background"
+    >
+
+    <!-- Ngày tháng -->
+    <TextView
+        android:id="@+id/day_month"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Dec"
+        android:textColor="@color/item_text_color"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:gravity="center" />
+
+    <!-- Ngày -->
+    <TextView
+        android:id="@+id/day_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="10"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:background="@drawable/item_circle_background"
+        android:padding="8dp"
+        android:gravity="center"
+        android:layout_marginTop="4dp" />
+
+</LinearLayout>

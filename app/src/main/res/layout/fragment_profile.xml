@@ -3,9 +3,32 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="16dp">
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <TextView
+            android:id="@+id/paymentTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Profile"
+            android:textAppearance="@style/payment_title"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Avatar Image -->
     <ImageView
@@ -14,14 +37,15 @@
         android:layout_height="100dp"
         android:layout_gravity="center"
         android:src="@drawable/ic_default_avatar"
-        android:contentDescription="User Avatar" />
+        android:contentDescription="User Avatar"
+        android:layout_marginTop="30dp"/>
 
     <!-- Button to choose an image -->
     <Button
         android:id="@+id/buttonChooseImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Chọn ảnh"
+        android:text="Upload Avatar"
         android:layout_gravity="center"
         android:layout_margin="10dp"
         />
@@ -30,7 +54,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tên người dùng"
+        android:text="Your Name"
         android:textStyle="bold" />
 
     <TextView
@@ -43,7 +67,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Số điện thoại"
+        android:text="Phone Number"
         android:textStyle="bold" />
 
     <TextView
@@ -70,7 +94,7 @@
         android:id="@+id/buttonEditProfile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Chỉnh sửa thông tin"
+        android:text="Edit Profile"
         android:layout_gravity="center"
         android:layout_marginTop="16dp"/>
 

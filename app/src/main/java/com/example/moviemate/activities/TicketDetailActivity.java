@@ -1,6 +1,7 @@
 package com.example.moviemate.activities;
 
 import android.os.Bundle;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +22,7 @@ import java.util.List;
 
 public class TicketDetailActivity extends AppCompatActivity {
 
+    private ImageButton backBtn;
     private ImageView moviePoster, barcodeImage;
     private TextView movieTitle, movieDuration, movieGenre, showTime, seatInfo, price, cinemaLocation, cinemaAddress, orderId;
     private DatabaseReference userTicketsRef;
@@ -31,6 +33,7 @@ public class TicketDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_ticket_detail);
 
         // Khởi tạo các view
+        backBtn = findViewById(R.id.BackBtn);
         moviePoster = findViewById(R.id.detail_movie_poster);
         movieTitle = findViewById(R.id.detail_movie_title);
         movieDuration = findViewById(R.id.detail_movie_duration);
@@ -52,6 +55,8 @@ public class TicketDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "Ticket ID không hợp lệ", Toast.LENGTH_SHORT).show();
             finish();
         }
+
+        backBtn.setOnClickListener(v -> finish());
     }
 
     private void loadTicketDetails(String ticketID) {
@@ -66,7 +71,7 @@ public class TicketDetailActivity extends AppCompatActivity {
                 if (ticket != null) {
 
                     // Hiển thị các thông tin chính từ ticket
-                    showTime.setText(ticket.getTime() + " • " + ticket.getDate());
+                    showTime.setText(ticket.getTime() + "\n" + ticket.getDate());
 
                     // Xử lý ghế ngồi dưới dạng danh sách
                     List<String> seats = ticket.getSeats();

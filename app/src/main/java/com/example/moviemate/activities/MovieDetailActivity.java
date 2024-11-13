@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,6 +35,7 @@ import java.util.List;
 
 public class MovieDetailActivity extends AppCompatActivity {
 
+    private ImageButton backBtn;
     private ImageView moviePoster;
     private TextView movieTitle, movieGenre, movieRating, movieLanguage, movieTime, movieDescription, cinemaSectionTitle;
     private RecyclerView cinemaRecyclerView, directorRecyclerView, actorRecyclerView;
@@ -50,6 +52,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_movie_detail);
 
         // Khởi tạo các view
+        backBtn = findViewById(R.id.BackBtn);
         moviePoster = findViewById(R.id.movie_poster);
         movieTitle = findViewById(R.id.movie_title);
         movieGenre = findViewById(R.id.movie_genre);
@@ -67,6 +70,8 @@ public class MovieDetailActivity extends AppCompatActivity {
         // Nhận movie_id từ Intent
         Intent intent = getIntent();
         movieID = intent.getIntExtra("movie_id", -1);
+
+        backBtn.setOnClickListener(v -> finish());
 
         // Kiểm tra movie_id hợp lệ
         if (movieID != -1) {
@@ -86,6 +91,7 @@ public class MovieDetailActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this, "Trailer not available", Toast.LENGTH_SHORT).show();
             }
+
         });
 
         // Xử lý khi nhấn nút "Continue"
@@ -128,11 +134,11 @@ public class MovieDetailActivity extends AppCompatActivity {
     // Hiển thị chi tiết phim
     private void displayMovieDetails(Movie movie) {
         movieTitle.setText(movie.getTitle());
-        movieGenre.setText("Movie genre: " + String.join(", ", movie.getGenre()));
-        movieRating.setText("Rating: " + movie.getRating());
-        movieLanguage.setText("Language: " + movie.getLanguage());
-        movieTime.setText("Time: " + movie.getTime());
-        movieDescription.setText("Description: " + movie.getDescription());
+        movieGenre.setText(String.join(", ", movie.getGenre()));
+        movieRating.setText(movie.getRating());
+        movieLanguage.setText(movie.getLanguage());
+        movieTime.setText(movie.getTime());
+        movieDescription.setText(movie.getDescription());
         Picasso.get().load(movie.getPoster()).into(moviePoster);
         watchTrailerButton.setTag(movie.getTrailer());
 

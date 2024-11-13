@@ -2,21 +2,33 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="@color/black"
     android:padding="16dp">
 
-    <!-- Tiêu đề của fragment -->
-    <TextView
-        android:id="@+id/ticket_fragment_title"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout3"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="My Tickets"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/white"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <TextView
+            android:id="@+id/paymentTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="My Ticket"
+            android:textAppearance="@style/payment_title"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- RecyclerView hiển thị danh sách vé -->
     <androidx.recyclerview.widget.RecyclerView
@@ -25,6 +37,8 @@
         android:layout_height="wrap_content"
         android:clipToPadding="false"
         android:paddingBottom="16dp"
-        android:layout_gravity="center_horizontal"/>
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center_horizontal"
+        />
 
 </LinearLayout>
