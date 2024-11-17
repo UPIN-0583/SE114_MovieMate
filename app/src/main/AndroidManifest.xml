@@ -27,6 +27,9 @@
             android:name=".activities.SelectSeatActivity"
             android:exported="false" />
         <activity
+            android:name=".activities.PayOsActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.MovieDetailActivity"
             android:exported="false" />
         <activity
