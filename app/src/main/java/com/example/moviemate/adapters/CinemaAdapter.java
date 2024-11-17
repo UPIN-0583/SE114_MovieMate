@@ -20,10 +20,18 @@ public class CinemaAdapter extends RecyclerView.Adapter<CinemaAdapter.CinemaView
 
     private Context context;
     private List<Cinema> cinemaList;
+    private OnCinemaSelectedListener listener;
+    private int selectedPosition = RecyclerView.NO_POSITION; // Vị trí rạp được chọn
 
-    public CinemaAdapter(Context context, List<Cinema> cinemaList) {
+    public CinemaAdapter(Context context, List<Cinema> cinemaList, OnCinemaSelectedListener listener) {
         this.context = context;
         this.cinemaList = cinemaList;
+        this.listener = listener;
+    }
+
+    // Interface để thông báo khi một rạp được chọn
+    public interface OnCinemaSelectedListener {
+        void onCinemaSelected(Cinema cinema);
     }
 
     @NonNull
@@ -36,23 +44,37 @@ public class CinemaAdapter extends RecyclerView.Adapter<CinemaAdapter.CinemaView
     @Override
     public void onBindViewHolder(@NonNull CinemaViewHolder holder, int position) {
         Cinema cinema = cinemaList.get(position);
+
+        // Thiết lập thông tin cho từng item
         holder.cinemaName.setText(cinema.getCinemaName());
         holder.cinemaAddress.setText(cinema.getAddress());
 
-        // Load cinema logo using Picasso
+        // Tải logo của rạp chiếu phim bằng Picasso
         Picasso.get().load(cinema.getBrandLogo()).into(holder.cinemaLogo);
 
-//        // Optional: Show the list of movies being played at the cinema
-//        StringBuilder movieInfo = new StringBuilder();
-//        if (cinema.getMovies() != null && !cinema.getMovies().isEmpty()) {
-//            for (int i = 0; i < cinema.getMovies().size(); i++) {
-//                movieInfo.append(cinema.getMovies().get(i).getMovieID()); // Thay MovieID bằng tiêu đề phim nếu cần
-//                if (i != cinema.getMovies().size() - 1) {
-//                    movieInfo.append(", ");
-//                }
-//            }
-//        }
-//        holder.cinemaMovies.setText(movieInfo.toString());
+        // Thay đổi nền của item dựa trên vị trí được chọn
+        if (position == selectedPosition) {
+            holder.cinemaContainer.setBackgroundResource(R.drawable.cinema_background_selected); // Nền khi được chọn
+        } else {
+            holder.cinemaContainer.setBackgroundResource(R.drawable.cinema_background_unselected); // Nền khi không được chọn
+        }
+
+        // Xử lý sự kiện click cho từng item
+        holder.itemView.setOnClickListener(v -> {
+            // Lưu lại vị trí đã chọn trước đó
+            int previousPosition = selectedPosition;
+            // Cập nhật vị trí đã chọn
+            selectedPosition = holder.getAdapterPosition();
+
+            // Cập nhật lại item cũ và item mới
+            notifyItemChanged(previousPosition); // Làm mới item trước đó
+            notifyItemChanged(selectedPosition); // Làm mới item hiện tại
+
+            // Gọi listener để thông báo rằng một item đã được chọn
+            if (listener != null) {
+                listener.onCinemaSelected(cinema);
+            }
+        });
     }
 
     @Override
@@ -60,16 +82,18 @@ public class CinemaAdapter extends RecyclerView.Adapter<CinemaAdapter.CinemaView
         return (cinemaList != null) ? cinemaList.size() : 0;
     }
 
+    // ViewHolder cho CinemaAdapter
     public static class CinemaViewHolder extends RecyclerView.ViewHolder {
         ImageView cinemaLogo;
-        TextView cinemaName, cinemaAddress, cinemaMovies;  // Thêm cinemaMovies để hiển thị danh sách phim
+        TextView cinemaName, cinemaAddress, cinemaDistance;
+        View cinemaContainer;
 
         public CinemaViewHolder(@NonNull View itemView) {
             super(itemView);
             cinemaLogo = itemView.findViewById(R.id.cinema_logo);
             cinemaName = itemView.findViewById(R.id.cinema_name);
             cinemaAddress = itemView.findViewById(R.id.cinema_address);
-//            cinemaMovies = itemView.findViewById(R.id.cinema_movies); // Đảm bảo rằng cinema_movies có trong layout
+            cinemaContainer = itemView.findViewById(R.id.cinema_container); // Tham chiếu đến layout chứa để thay đổi nền
         }
     }
 }

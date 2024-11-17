@@ -3,7 +3,7 @@ package com.example.moviemate.models;
 import java.io.Serializable;
 
 public class Banner implements Serializable {
-    private String BannerID;
+    private int BannerID;
     private String Image;
 
     // Constructor mặc định
@@ -11,17 +11,17 @@ public class Banner implements Serializable {
     }
 
     // Constructor đầy đủ
-    public Banner(String bannerID, String image) {
+    public Banner(int bannerID, String image) {
         this.BannerID = bannerID;
         this.Image = image;
     }
 
     // Getters và Setters
-    public String getBannerID() {
+    public int getBannerID() {
         return BannerID;
     }
 
-    public void setBannerID(String bannerID) {
+    public void setBannerID(int bannerID) {
         BannerID = bannerID;
     }
 

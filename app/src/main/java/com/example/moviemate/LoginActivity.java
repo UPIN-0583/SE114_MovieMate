@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.splashscreen.SplashScreen;
 
 import com.example.moviemate.activities.ForgotPasswordActivity;
+import com.example.moviemate.models.User;
 import com.example.moviemate.utils.CustomDialog;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -26,6 +27,8 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -33,7 +36,7 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private static final int RC_SIGN_IN = 9001;
     private GoogleSignInClient mGoogleSignInClient;
-
+    private DatabaseReference database;
     private boolean passwordVisible = false;
     private ImageButton showHidePasswordButton;
 
@@ -52,6 +55,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
+        database = FirebaseDatabase.getInstance().getReference("Users");
 
         emailField = findViewById(R.id.login_email);
         passwordField = findViewById(R.id.login_password);
@@ -151,22 +155,42 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    // Hàm để xác thực với Firebase sau khi đăng nhập bằng Google thành công
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        // Đăng nhập thành công, chuyển đến màn hình chính hoặc xử lý logic khác
+                        // Đăng nhập thành công, lưu thông tin người dùng vào Database nếu chưa tồn tại
                         FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            checkAndSaveUserToDatabase(user);
+                        }
                         Toast.makeText(LoginActivity.this, "Google sign-in successful", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
-                        // Điều hướng sang màn hình khác
+                        finish(); // Đóng LoginActivity sau khi đăng nhập thành công
                     } else {
                         // Đăng nhập thất bại
                         CustomDialog.showAlertDialog(LoginActivity.this, R.drawable.ic_error, "Error", "Google sign-in failed.", false);
                     }
                 });
+    }
+
+    private void checkAndSaveUserToDatabase(FirebaseUser firebaseUser) {
+        String uid = firebaseUser.getUid();
+        DatabaseReference userRef = database.child(uid);
+
+        userRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && !task.getResult().exists()) {
+                // Nếu người dùng chưa tồn tại trong Database, tạo bản ghi mới
+                String email = firebaseUser.getEmail();
+                String name = firebaseUser.getDisplayName();
+                User user = new User(name, null, email, null); // Chỉ lưu name và email
+
+                userRef.setValue(user)
+                        .addOnSuccessListener(aVoid -> Log.d("LoginActivity", "User saved to database"))
+                        .addOnFailureListener(e -> Log.e("LoginActivity", "Failed to save user to database", e));
+            }
+        });
     }
 }

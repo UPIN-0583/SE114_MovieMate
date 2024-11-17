@@ -1,0 +1,62 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:background="@drawable/ticket_background"
+    android:layout_marginBottom="8dp">
+
+    <!-- Poster phim -->
+    <ImageView
+        android:id="@+id/movie_poster"
+        android:layout_width="80dp"
+        android:layout_height="120dp"
+        android:scaleType="centerCrop"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_marginStart="10dp">
+
+        <!-- Tên phim -->
+        <TextView
+            android:id="@+id/movie_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:layout_marginTop="15dp"/>
+
+        <!-- Thời gian chiếu -->
+        <TextView
+            android:id="@+id/show_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/darker_gray"
+            android:drawableLeft="@drawable/ic_clock2"
+            android:drawablePadding="4dp"
+            android:layout_marginTop="8dp"
+            />
+
+        <!-- Địa điểm chiếu -->
+        <TextView
+            android:id="@+id/cinema_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/darker_gray"
+            android:drawableLeft="@drawable/ic_location2"
+            android:drawablePadding="4dp"
+            android:layout_marginTop="6dp"
+            />
+    </LinearLayout>
+</LinearLayout>
