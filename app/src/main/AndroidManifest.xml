@@ -15,6 +15,9 @@
         android:theme="@style/Theme.MovieMate"
         tools:targetApi="31">
         <activity
+            android:name=".activities.PayOsActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.MovieDetailActivity"
             android:exported="false" />
         <activity
