@@ -53,10 +53,77 @@
             android:layout_width="match_parent"
             android:layout_height="0dp">
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/paymentMovieBanner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/payment_movie_banner"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/moviePosterImageView"
+                    android:layout_width="100dp"
+                    android:layout_height="141dp"
+                    android:src="@drawable/app_banner_vertical_splash"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginStart="16dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/moviePosterImageView"
+                    app:layout_constraintTop_toTopOf="parent">
+                    <TextView
+                        android:id="@+id/movieTitleTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Movie Title"
+                        android:textColor="@color/yellow"
+                        android:fontFamily="@font/sf_pro"
+                        android:textSize="24sp" />
+
+                    <TextView
+                        android:id="@+id/movieGenreTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Movie Genre"
+                        android:fontFamily="@font/sf_pro"
+                        android:drawablePadding="8dp"
+                        app:drawableStartCompat="@drawable/ic_movie_genre" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="MovieMate Cinema"
+                        android:fontFamily="@font/sf_pro"
+                        android:drawablePadding="8dp"
+                        app:drawableStartCompat="@drawable/ic_location_pin" />
+
+                    <TextView
+                        android:id="@+id/movieTimeTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="10.12.2022 • 14:15"
+                        android:fontFamily="@font/sf_pro"
+                        android:drawablePadding="8dp"
+                        app:drawableStartCompat="@drawable/ic_clock" />
+                </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
             <ListView
                 android:id="@+id/paymentMethodListView"
                 android:layout_width="0dp"
-                android:layout_height="125dp"
+                android:layout_height="208dp"
                 android:layout_marginBottom="16dp"
                 android:divider="@android:color/transparent"
                 android:nestedScrollingEnabled="true"
@@ -102,16 +169,33 @@
                 app:layout_constraintBottom_toTopOf="@+id/textView"
                 app:layout_constraintStart_toStartOf="parent" />
 
-            <TextView
-                android:id="@+id/totalMoneyTextView"
+            <LinearLayout
+                android:id="@+id/totalMoneyLayout"
                 android:layout_width="wrap_content"
+                android:orientation="horizontal"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
-                android:text="189.000 VND"
-                android:textAppearance="@style/vnd"
-                app:layout_constraintBottom_toTopOf="@+id/textView"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/textView">
+
+                <TextView
+                    android:id="@+id/totalMoneyTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="2dp"
+                    android:fontFamily="@font/sf_pro"
+                    android:text="1"
+                    android:textColor="@color/yellow"
+                    android:textSize="24sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/vnd"
+                    android:textColor="@color/yellow"
+                    android:fontFamily="@font/sf_pro"
+                    android:textSize="24sp" />
+            </LinearLayout>
 
             <View
                 android:id="@+id/view"
@@ -121,7 +205,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
                 android:background="@color/soft_dark_gray"
-                app:layout_constraintBottom_toTopOf="@+id/totalMoneyTextView"
+                app:layout_constraintBottom_toTopOf="@+id/totalMoneyLayout"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
@@ -187,9 +271,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp"
                 android:text="@string/order_id"
                 android:textAppearance="@style/text_label"
+                app:layout_constraintTop_toBottomOf="@id/paymentMovieBanner"
                 app:layout_constraintBottom_toTopOf="@+id/textView3"
                 app:layout_constraintStart_toStartOf="parent" />
 
@@ -197,10 +283,12 @@
                 android:id="@+id/orderIdTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="8dp"
-                android:text="78889377726"
+                android:text="1000"
                 android:textAppearance="@style/text_label"
+                app:layout_constraintTop_toBottomOf="@id/paymentMovieBanner"
                 app:layout_constraintBottom_toTopOf="@+id/seatTextView"
                 app:layout_constraintEnd_toEndOf="parent" />
 
@@ -240,12 +328,14 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/paymentTimeLeft"
+                    android:id="@+id/paymentTimeLeftTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
                     android:text="15:00"
-                    android:textAppearance="@style/text_label_highlight"
+                    android:textSize="16sp"
+                    android:textColor="@color/yellow"
+                    android:fontFamily="@font/sf_pro"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

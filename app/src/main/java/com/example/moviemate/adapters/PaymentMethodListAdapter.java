@@ -20,11 +20,16 @@ import java.util.List;
 
 public class PaymentMethodListAdapter extends ArrayAdapter<PaymentMethod> {
     int resource;
-    ConstraintLayout currentSelected = null;
+    private ConstraintLayout currentSelected = null;
+    private PaymentMethod selectedPaymentMethod = null;
 
     public PaymentMethodListAdapter(Context context, int resource, List<PaymentMethod> paymentMethods) {
         super(context, resource, paymentMethods);
         this.resource = resource;
+    }
+
+    public PaymentMethod getSelectedPaymentMethod() {
+        return selectedPaymentMethod;
     }
 
     @NonNull
@@ -51,6 +56,7 @@ public class PaymentMethodListAdapter extends ArrayAdapter<PaymentMethod> {
                 if (currentSelected != null)
                     currentSelected.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.payment_method_background));
 
+                selectedPaymentMethod = paymentMethod;
                 currentSelected = (ConstraintLayout) paymentMethodLayout;
                 currentSelected.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.payment_method_background_selected));
             }
