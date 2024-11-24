@@ -26,11 +26,13 @@ import com.example.moviemate.api.objects.payos.CreatePayLinkResponse;
 import com.example.moviemate.api.objects.payos.SimpleMovieDescription;
 import com.example.moviemate.models.PaymentMethod;
 import com.example.moviemate.utils.CustomDialog;
+import com.example.moviemate.utils.OrderIdGenerator;
 
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -83,9 +85,9 @@ public class PaymentActivity extends AppCompatActivity {
                     String status = data.getStringExtra("status");
                     if (status == null) return;
                     if (status.equals("cancel")) {
-                        cancelPayment("Payment cancelled by user");
+                        cancelPayment("Thanh toán huỷ bởi người dùng");
                     } else if (status.equals("success")) {
-                        CustomDialog.showAlertDialog(this, R.drawable.ic_success, "Success", "Payment successful", false);
+                        successPayment();
                     }
                 }
         );
@@ -103,7 +105,6 @@ public class PaymentActivity extends AppCompatActivity {
             return insets;
         });
     }
-
     private void initializeViews() {
         backButton = findViewById(R.id.paymentBackBtn);
         movieTitleTextView = findViewById(R.id.movieTitleTextView);
@@ -119,7 +120,6 @@ public class PaymentActivity extends AppCompatActivity {
         paymentTimeLeftTextView = findViewById(R.id.paymentTimeLeftTextView);
         payBtn = findViewById(R.id.payBtn);
     }
-
     private void setupListeners() {
         setupBackPress();
         applyDiscountBtn.setOnClickListener(v -> applyDiscountCode());
@@ -159,14 +159,11 @@ public class PaymentActivity extends AppCompatActivity {
         }
     }
     private void handlePaymentTimeout() {
-        String reason = "Payment timeout";
-        runOnUiThread(() -> cancelPayment(reason));
+        runOnUiThread(() -> cancelPayment("Hết thời gian thanh toán"));
     }
 
     private void initPaymentMethods() {
         List<PaymentMethod> paymentMethods = List.of(
-                new PaymentMethod(PaymentMethod.TYPE.ZALO_PAY, "Zalo Pay", R.drawable.logo_zalopay),
-                new PaymentMethod(PaymentMethod.TYPE.MOMO, "MoMo", R.drawable.logo_momo),
                 new PaymentMethod(PaymentMethod.TYPE.QR_CODE, "QR Code", R.drawable.logo_qrcode)
         );
 
@@ -182,25 +179,18 @@ public class PaymentActivity extends AppCompatActivity {
             return;
         }
 
-        if (paymentMethodListAdapter.getSelectedPaymentMethod().getType() == PaymentMethod.TYPE.QR_CODE) {
-            payWithQRCode();
-        }
-        else {
-            CustomDialog.showAlertDialog(this, R.drawable.ic_success, "Info", "Comming soon", false);
-        }
+        payWithQRCode();
     }
 
     private void payWithQRCode() {
-        final String CANCEL_URL = "https://moviemate.com/cancel";
-        final String RETURN_URL = "https://moviemate.com/success";
-
-        // IMPORTANT: Please remove this line in production
-        totalMoneyTextView.setText(formatMoney(2000));
+        final String CANCEL_URL = "http://cancelpayment.com";
+        final String RETURN_URL = "http://successpayment.com";
+        final String ORDER_ID_EXIST_ERR_CODE = "231";
 
         payBtn.setEnabled(false); // Disable pay button to prevent multiple payments
         int totalMoney = parseMoney(totalMoneyTextView.getText().toString());
         if (totalMoney == 0) {
-            // Do something with 0d payment
+
             return;
         }
 
@@ -208,7 +198,8 @@ public class PaymentActivity extends AppCompatActivity {
         SimpleMovieDescription movieDescription = new SimpleMovieDescription(movieTitleTextView.getText().toString(), quantity, totalMoney);
         long expiredAt = (System.currentTimeMillis() / 1000) + (PAYMENT_TIMEOUT / 1000);
 
-        CreatePayLink data = new CreatePayLink(13, totalMoney, "Movie ticket",
+        int orderId = OrderIdGenerator.generateOrderId();
+        CreatePayLink data = new CreatePayLink(orderId, totalMoney, "Movie ticket",
                 List.of(movieDescription), CANCEL_URL, RETURN_URL, expiredAt);
 
         Dotenv dotenv = Dotenv.configure().directory("/assets").filename("env").load();
@@ -217,16 +208,19 @@ public class PaymentActivity extends AppCompatActivity {
             public void onResponse(Call<CreatePayLinkResponse> call, Response<CreatePayLinkResponse> response) {
                 payBtn.setEnabled(true);
 
-                if (!response.isSuccessful()) {
-                    CustomDialog.showAlertDialog(PaymentActivity.this, R.drawable.ic_error, "Error", "Create payment link failed", false);
+                if (!response.isSuccessful() || response.body() == null) {
+                    cancelPayment("Tạo link thanh toán thất bại (Lỗi mạng)" );
                     return;
                 }
 
                 CreatePayLinkResponse dataResponse = response.body();
-                Log.d("[MovieMate] PaymentActivity", Objects.requireNonNull(dataResponse).toString());
 
-                if (dataResponse == null || !dataResponse.getCode().equals("00")) {
-                    CustomDialog.showAlertDialog(PaymentActivity.this, R.drawable.ic_error, "Error", "Create payment link failed (PayOS API failed)", false);
+                if (dataResponse.getCode().equals(ORDER_ID_EXIST_ERR_CODE)) {
+                    cancelPayment("Tạo link thanh toán thất bại (Order ID đã tồn tại)");
+                    return;
+                }
+                else if (!dataResponse.getCode().equals("00")) {
+                    cancelPayment("Tạo link thanh toán thất bại (Lỗi PayOS API)");
                     return;
                 }
 
@@ -240,7 +234,7 @@ public class PaymentActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<CreatePayLinkResponse> call, Throwable throwable) {
-                CustomDialog.showAlertDialog(PaymentActivity.this, R.drawable.ic_error, "Error", "Create payment link failed (Network error)", false);
+                cancelPayment("Tạo link thanh toán thất bại (Lỗi mạng)");
             }
         });
 
@@ -251,7 +245,15 @@ public class PaymentActivity extends AppCompatActivity {
             paymentTimer.cancel();
         }
 
-        CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Error", "Payment cancelled due to: " + reason, false);
+        CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Thông báo", "Huỷ thanh toán do: " + reason, true);
+    }
+
+    private void successPayment() {
+        if (paymentTimer != null) {
+            paymentTimer.cancel();
+        }
+
+        CustomDialog.showAlertDialog(this, R.drawable.ic_success, "Thành công", "Thanh toán thành công", true);
     }
 
     private void applyDiscountCode() {
