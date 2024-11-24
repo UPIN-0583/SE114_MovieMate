@@ -93,12 +93,12 @@ public class RegisterActivity extends AppCompatActivity {
         String confirmPassword = confirmPasswordField.getText().toString().trim();
 
         if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-            CustomDialog.showAlertDialog(RegisterActivity.this, R.drawable.ic_error, "Error", "Please enter all details", false);
+            CustomDialog.showAlertDialog(RegisterActivity.this, R.drawable.ic_error, "Lỗi", "Vui lòng điền đầy đủ thông tin", false);
             return;
         }
 
         if (password.compareTo(confirmPassword) != 0) {
-            CustomDialog.showAlertDialog(RegisterActivity.this, R.drawable.ic_error, "Error", "Passwords do not match", false);
+            CustomDialog.showAlertDialog(RegisterActivity.this, R.drawable.ic_error, "Lỗi", "Mật khẩu không khớp", false);
             return;
         }
 
@@ -115,13 +115,12 @@ public class RegisterActivity extends AppCompatActivity {
 
                             database.child(uid).setValue(user)
                                     .addOnSuccessListener(aVoid -> {
-                                        CustomDialog.showAlertDialog(RegisterActivity.this, R.drawable.ic_success, "Success", "Registration successful", true);
-                                        finish(); // Đóng Activity sau khi đăng ký thành công
+                                        CustomDialog.showAlertDialog(RegisterActivity.this, R.drawable.ic_success, "Thông báo", "Đăng ký thành công", true);
                                     })
                                     .addOnFailureListener(e -> Toast.makeText(RegisterActivity.this, "Lưu thông tin thất bại", Toast.LENGTH_SHORT).show());
                         }
                     } else {
-                        CustomDialog.showAlertDialog(RegisterActivity.this, R.drawable.ic_error, "Error", task.getException().getMessage(), false);
+                        CustomDialog.showAlertDialog(RegisterActivity.this, R.drawable.ic_error, "Lỗi", task.getException().getMessage(), false);
                     }
                 });
     }
