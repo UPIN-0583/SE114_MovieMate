@@ -42,4 +42,39 @@ public class CustomDialog {
 
         dialog.show();
     }
+
+    public interface QuestionDialogListener {
+        void response(boolean isYes);
+    }
+
+    public static void showQuestionDialog(Context context, String title, String message, QuestionDialogListener listener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        View view = LayoutInflater.from(context).inflate(R.layout.dialog_question_layout, null);
+
+        ImageView iconView = view.findViewById(R.id.dialog_icon);
+        TextView titleView = view.findViewById(R.id.dialog_title);
+        TextView messageView = view.findViewById(R.id.dialog_content);
+        Button yesButton = view.findViewById(R.id.dialog_yes);
+        Button noButton = view.findViewById(R.id.dialog_no);
+
+        iconView.setImageResource(R.drawable.ic_question);
+        titleView.setText(title);
+        messageView.setText(message);
+
+        builder.setView(view);
+        AlertDialog dialog = builder.create();
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+        yesButton.setOnClickListener(v -> {
+            listener.response(true);
+            dialog.dismiss();
+        });
+
+        noButton.setOnClickListener(v -> {
+            listener.response(false);
+            dialog.dismiss();
+        });
+
+        dialog.show();
+    }
 }
