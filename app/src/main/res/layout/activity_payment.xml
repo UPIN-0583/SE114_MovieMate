@@ -102,11 +102,12 @@
                         app:drawableStartCompat="@drawable/ic_movie_genre" />
 
                     <TextView
+                        android:id="@+id/cinemaNameTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="MovieMate Cinema"
-                        android:fontFamily="@font/sf_pro"
                         android:drawablePadding="8dp"
+                        android:fontFamily="@font/sf_pro"
+                        android:text="MovieMate Cinema"
                         app:drawableStartCompat="@drawable/ic_location_pin" />
 
                     <TextView
