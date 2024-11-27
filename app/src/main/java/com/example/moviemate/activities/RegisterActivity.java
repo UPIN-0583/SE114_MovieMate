@@ -115,12 +115,12 @@ public class RegisterActivity extends AppCompatActivity {
 
                             database.child(uid).setValue(user)
                                     .addOnSuccessListener(aVoid -> {
-                                        CustomDialog.showAlertDialog(RegisterActivity.this, R.drawable.ic_success, "Thông báo", "Đăng ký thành công", true);
+                                        CustomDialog.showAlertDialog(RegisterActivity.this, R.drawable.ic_success, "Notice", "Registration successful", true);
                                     })
-                                    .addOnFailureListener(e -> Toast.makeText(RegisterActivity.this, "Lưu thông tin thất bại", Toast.LENGTH_SHORT).show());
+                                    .addOnFailureListener(e -> Toast.makeText(RegisterActivity.this, "Failed to save user information", Toast.LENGTH_SHORT).show());
                         }
                     } else {
-                        CustomDialog.showAlertDialog(RegisterActivity.this, R.drawable.ic_error, "Lỗi", task.getException().getMessage(), false);
+                        CustomDialog.showAlertDialog(RegisterActivity.this, R.drawable.ic_error, "Error", task.getException().getMessage(), false);
                     }
                 });
     }

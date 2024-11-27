@@ -36,4 +36,8 @@
     <string name="welcome_back">Welcome back</string>
     <string name="now_playing">Now Playing</string>
     <string name="coming_soon">Coming Soon</string>
+    <string name="search">Search</string>
+    <string name="clear">Clear</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

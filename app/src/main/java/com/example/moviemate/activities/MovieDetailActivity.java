@@ -35,15 +35,11 @@ import java.util.List;
 
 public class MovieDetailActivity extends AppCompatActivity {
 
-    private ImageButton backBtn;
     private ImageView moviePoster;
     private TextView movieTitle, movieGenre, movieRating, movieLanguage, movieTime, movieDescription, cinemaSectionTitle;
     private RecyclerView cinemaRecyclerView, directorRecyclerView, actorRecyclerView;
-    private CinemaAdapter cinemaAdapter;
-    private PersonAdapter directorAdapter, actorAdapter;
     private Button watchTrailerButton, continueButton;
-    private DatabaseReference movieRef, cinemaRef;
-    private int movieID;
+    private Movie movie; // Movie object được chuyển từ Intent
     private Cinema selectedCinema; // Rạp được chọn
 
     @Override
@@ -52,7 +48,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_movie_detail);
 
         // Khởi tạo các view
-        backBtn = findViewById(R.id.BackBtn);
+        ImageButton backBtn = findViewById(R.id.BackBtn);
         moviePoster = findViewById(R.id.movie_poster);
         movieTitle = findViewById(R.id.movie_title);
         movieGenre = findViewById(R.id.movie_genre);
@@ -69,18 +65,14 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         // Nhận movie_id từ Intent
         Intent intent = getIntent();
-        movieID = intent.getIntExtra("movie_id", -1);
+        movie = (Movie) intent.getSerializableExtra("movie"); // Lấy movie object từ Intent
 
         backBtn.setOnClickListener(v -> finish());
 
-        // Kiểm tra movie_id hợp lệ
-        if (movieID != -1) {
-            fetchMovieDetailsFromFirebase(movieID);
-            fetchCinemasFromFirebase(movieID);
-        } else {
-            Toast.makeText(this, "Invalid movie ID", Toast.LENGTH_SHORT).show();
-            finish();
-        }
+
+        if (movie == null) finish();
+        displayMovieDetails();
+        fetchCinemasFromFirebase();
 
         // Xử lý khi nhấn nút "Watch Trailer"
         watchTrailerButton.setOnClickListener(v -> {
@@ -99,7 +91,8 @@ public class MovieDetailActivity extends AppCompatActivity {
             if (selectedCinema != null) {
                 Intent selectSeatIntent = new Intent(MovieDetailActivity.this, SelectSeatActivity.class);
                 selectSeatIntent.putExtra("cinema_id", selectedCinema.getCinemaID());
-                selectSeatIntent.putExtra("movie_id", movieID);
+                selectSeatIntent.putExtra("cinema_name", selectedCinema.getCinemaName());
+                selectSeatIntent.putExtra("movie", movie);
                 startActivity(selectSeatIntent);
             } else {
                 Toast.makeText(MovieDetailActivity.this, "Please select a cinema first", Toast.LENGTH_SHORT).show();
@@ -107,32 +100,8 @@ public class MovieDetailActivity extends AppCompatActivity {
         });
     }
 
-    // Lấy dữ liệu phim từ Firebase Realtime Database
-    private void fetchMovieDetailsFromFirebase(int movieID) {
-        movieRef = FirebaseDatabase.getInstance().getReference("Movies").child("Movie" + movieID);
-
-        movieRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    Movie movie = snapshot.getValue(Movie.class);
-                    if (movie != null) {
-                        displayMovieDetails(movie);
-                    }
-                } else {
-                    Toast.makeText(MovieDetailActivity.this, "Movie not found", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(MovieDetailActivity.this, "Error fetching movie details", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
     // Hiển thị chi tiết phim
-    private void displayMovieDetails(Movie movie) {
+    private void displayMovieDetails() {
         movieTitle.setText(movie.getTitle());
         movieGenre.setText(String.join(", ", movie.getGenre()));
         movieRating.setText(movie.getRating());
@@ -145,7 +114,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         List<Person> directors = movie.getDirector();
         if (directors != null && !directors.isEmpty()) {
             directorRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-            directorAdapter = new PersonAdapter(this, directors);
+            PersonAdapter directorAdapter = new PersonAdapter(this, directors);
             directorRecyclerView.setAdapter(directorAdapter);
             directorRecyclerView.setVisibility(View.VISIBLE);
         }
@@ -153,15 +122,15 @@ public class MovieDetailActivity extends AppCompatActivity {
         List<Person> actors = movie.getActor();
         if (actors != null && !actors.isEmpty()) {
             actorRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-            actorAdapter = new PersonAdapter(this, actors);
+            PersonAdapter actorAdapter = new PersonAdapter(this, actors);
             actorRecyclerView.setAdapter(actorAdapter);
             actorRecyclerView.setVisibility(View.VISIBLE);
         }
     }
 
     // Lấy dữ liệu rạp chiếu từ Firebase Realtime Database
-    private void fetchCinemasFromFirebase(int movieID) {
-        cinemaRef = FirebaseDatabase.getInstance().getReference("Cinemas");
+    private void fetchCinemasFromFirebase() {
+        DatabaseReference cinemaRef = FirebaseDatabase.getInstance().getReference("Cinemas");
 
         cinemaRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -173,7 +142,7 @@ public class MovieDetailActivity extends AppCompatActivity {
                     if (cinema != null) {
                         List<ShowTime> showTimeList = new ArrayList<>();
 
-                        DataSnapshot movieSnapshot = cinemaSnapshot.child("Movies").child("Movie" + movieID).child("ShowTimes");
+                        DataSnapshot movieSnapshot = cinemaSnapshot.child("Movies").child("Movie" + movie.getMovieID()).child("ShowTimes");
 
                         // Lặp qua từng ngày chiếu trong ShowTimes
                         for (DataSnapshot daySnapshot : movieSnapshot.getChildren()) {
@@ -184,7 +153,7 @@ public class MovieDetailActivity extends AppCompatActivity {
                                 ShowTime showTime = timeSnapshot.getValue(ShowTime.class);
                                 if (showTime != null) {
                                     showTime.setDay(day);
-                                    showTime.setMovieID(movieID);
+                                    showTime.setMovieID(movie.getMovieID());
                                     showTimeList.add(showTime);
                                 }
                             }
@@ -209,7 +178,8 @@ public class MovieDetailActivity extends AppCompatActivity {
     private void displayCinemas(List<Cinema> cinemaList) {
         if (cinemaList != null && !cinemaList.isEmpty()) {
             cinemaRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-            cinemaAdapter = new CinemaAdapter(this, cinemaList, cinema -> {
+            // Lưu rạp được chọn
+            CinemaAdapter cinemaAdapter = new CinemaAdapter(this, cinemaList, cinema -> {
                 selectedCinema = cinema; // Lưu rạp được chọn
                 Toast.makeText(MovieDetailActivity.this, "Selected cinema: " + cinema.getCinemaName(), Toast.LENGTH_SHORT).show();
             });
