@@ -2,12 +2,12 @@ package com.example.moviemate.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
@@ -154,12 +154,30 @@ public class PaymentActivity extends AppCompatActivity {
         payBtn.setOnClickListener(v -> pay());
     }
     private void setupBackPress() {
-        backButton.setOnClickListener(v -> finish());
+        backButton.setOnClickListener(v -> {
+            CustomDialog.showQuestionDialog(
+                    PaymentActivity.this,
+                    "Warning",
+                    "Are you sure you want to cancel the payment?",
+                    isYes -> {
+                        if (isYes) {
+                            cancelPayment("User cancelled payment");
+                        }
+                    });
+        });
 
         getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                finish();
+                CustomDialog.showQuestionDialog(
+                        PaymentActivity.this,
+                        "Warning",
+                        "Are you sure you want to cancel the payment?",
+                        isYes -> {
+                            if (isYes) {
+                                cancelPayment("User cancelled payment");
+                            }
+                        });
             }
         });
     }
@@ -187,7 +205,7 @@ public class PaymentActivity extends AppCompatActivity {
         }
     }
     private void handlePaymentTimeout() {
-        runOnUiThread(() -> cancelPayment("Hết thời gian thanh toán"));
+        runOnUiThread(() -> cancelPayment("Payment timeout"));
     }
 
     private void initPaymentMethods() {
@@ -218,7 +236,7 @@ public class PaymentActivity extends AppCompatActivity {
         payBtn.setEnabled(false); // Disable pay button to prevent multiple payments
         int totalMoney = parseMoney(totalMoneyTextView.getText().toString());
         if (totalMoney == 0) {
-
+            successPayment();
             return;
         }
 
@@ -227,7 +245,8 @@ public class PaymentActivity extends AppCompatActivity {
         long expiredAt = (System.currentTimeMillis() / 1000) + (PAYMENT_TIMEOUT / 1000);
 
         int orderId = Integer.parseInt(orderIdTextView.getText().toString());
-        CreatePayLink data = new CreatePayLink(orderId, totalMoney, "Movie ticket",
+        // Change 2000 to totalMoney when in real use
+        CreatePayLink data = new CreatePayLink(orderId, 2000, "Movie ticket",
                 List.of(movieDescription), CANCEL_URL, RETURN_URL, expiredAt);
 
         Dotenv dotenv = Dotenv.configure().directory("/assets").filename("env").load();
@@ -237,18 +256,18 @@ public class PaymentActivity extends AppCompatActivity {
                 payBtn.setEnabled(true);
 
                 if (!response.isSuccessful() || response.body() == null) {
-                    cancelPayment("Tạo link thanh toán thất bại (Lỗi mạng)" );
+                    cancelPayment("Failed to create payment link (Network error)");
                     return;
                 }
 
                 CreatePayLinkResponse dataResponse = response.body();
 
                 if (dataResponse.getCode().equals(ORDER_ID_EXIST_ERR_CODE)) {
-                    cancelPayment("Tạo link thanh toán thất bại (Order ID đã tồn tại)");
+                    cancelPayment("Failed to create payment link (Order ID already exists)");
                     return;
                 }
                 else if (!dataResponse.getCode().equals("00")) {
-                    cancelPayment("Tạo link thanh toán thất bại (Lỗi PayOS API)");
+                    cancelPayment("Failed to create payment link (PayOS API error)");
                     return;
                 }
 
@@ -262,7 +281,7 @@ public class PaymentActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<CreatePayLinkResponse> call, Throwable throwable) {
-                cancelPayment("Tạo link thanh toán thất bại (Lỗi mạng)");
+                cancelPayment("Failed to create payment link (Network error)");
             }
         });
 
@@ -273,7 +292,10 @@ public class PaymentActivity extends AppCompatActivity {
             paymentTimer.cancel();
         }
 
-        CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Thông báo", "Huỷ thanh toán do: " + reason, true);
+        Intent data = new Intent();
+        setResult(RESULT_CANCELED, data);
+
+        CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Notice", "Payment canceled due to: " + reason, true);
     }
 
     private void successPayment() {
@@ -281,7 +303,10 @@ public class PaymentActivity extends AppCompatActivity {
             paymentTimer.cancel();
         }
 
-        CustomDialog.showAlertDialog(this, R.drawable.ic_success, "Thành công", "Thanh toán thành công", true);
+        Intent data = new Intent();
+        setResult(RESULT_OK, data);
+
+        CustomDialog.showAlertDialog(this, R.drawable.ic_success, "Success", "Payment successful", true);
     }
 
     private void applyDiscountCode() {
