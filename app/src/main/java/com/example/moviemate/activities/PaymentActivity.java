@@ -24,15 +24,16 @@ import com.example.moviemate.api.PayOsApiService;
 import com.example.moviemate.api.objects.payos.CreatePayLink;
 import com.example.moviemate.api.objects.payos.CreatePayLinkResponse;
 import com.example.moviemate.api.objects.payos.SimpleMovieDescription;
+import com.example.moviemate.models.Movie;
 import com.example.moviemate.models.PaymentMethod;
 import com.example.moviemate.utils.CustomDialog;
 import com.example.moviemate.utils.OrderIdGenerator;
+import com.squareup.picasso.Picasso;
 
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -54,6 +55,7 @@ public class PaymentActivity extends AppCompatActivity {
     private ImageView backButton;
     private TextView movieTitleTextView;
     private TextView movieGenreTextView;
+    private TextView cinemaNameTextView;
     private TextView movieTimeTextView;
     private ImageView moviePosterImageView;
     private TextView orderIdTextView;
@@ -73,6 +75,7 @@ public class PaymentActivity extends AppCompatActivity {
         setupListeners();
         initPaymentMethods();
         startPaymentTimer();
+        setData();
 
         launcher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -93,6 +96,30 @@ public class PaymentActivity extends AppCompatActivity {
         );
     }
 
+    private void setData() {
+        Intent data = getIntent();
+
+        Movie movie = (Movie) data.getSerializableExtra("movie");
+        String cinemaName = data.getStringExtra("cinemaName");
+        String date = data.getStringExtra("selectedDate");
+        String time = data.getStringExtra("selectedTime");
+        String seats = data.getStringExtra("selectedSeats");
+        basePrice = data.getIntExtra("totalPrice", -1);
+        if (movie == null) {
+            finish();
+            return;
+        }
+
+        Picasso.get().load(movie.getPoster()).into(moviePosterImageView);
+        orderIdTextView.setText(String.valueOf(OrderIdGenerator.generateOrderId()));
+        movieTitleTextView.setText(movie.getTitle());
+        movieGenreTextView.setText(String.join(", ", movie.getGenre()));
+        cinemaNameTextView.setText(cinemaName);
+        movieTimeTextView.setText(String.format("%s %s", date, time));
+        seatTextView.setText(seats);
+        totalMoneyTextView.setText(formatMoney(basePrice));
+    }
+
     private void setupLayout(){
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_payment);
@@ -109,6 +136,7 @@ public class PaymentActivity extends AppCompatActivity {
         backButton = findViewById(R.id.paymentBackBtn);
         movieTitleTextView = findViewById(R.id.movieTitleTextView);
         movieGenreTextView = findViewById(R.id.movieGenreTextView);
+        cinemaNameTextView = findViewById(R.id.cinemaNameTextView);
         movieTimeTextView = findViewById(R.id.movieTimeTextView);
         moviePosterImageView = findViewById(R.id.moviePosterImageView);
         orderIdTextView = findViewById(R.id.orderIdTextView);
@@ -198,7 +226,7 @@ public class PaymentActivity extends AppCompatActivity {
         SimpleMovieDescription movieDescription = new SimpleMovieDescription(movieTitleTextView.getText().toString(), quantity, totalMoney);
         long expiredAt = (System.currentTimeMillis() / 1000) + (PAYMENT_TIMEOUT / 1000);
 
-        int orderId = OrderIdGenerator.generateOrderId();
+        int orderId = Integer.parseInt(orderIdTextView.getText().toString());
         CreatePayLink data = new CreatePayLink(orderId, totalMoney, "Movie ticket",
                 List.of(movieDescription), CANCEL_URL, RETURN_URL, expiredAt);
 
