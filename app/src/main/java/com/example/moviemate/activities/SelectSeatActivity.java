@@ -124,10 +124,12 @@ public class SelectSeatActivity extends AppCompatActivity {
                 result -> {
                     if (result.getResultCode() == RESULT_CANCELED) return;
 
-                    Intent data = result.getData();
-                    if (data == null) return;
-
                     saveTicketToFirebase();
+                    Intent intent = new Intent(this, MainActivity.class);
+                    // Xóa các Activity khác và tạo mới MainActivity
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    finish();
                 }
         );
     }
