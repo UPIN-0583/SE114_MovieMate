@@ -57,6 +57,12 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
+        // Nếu người dùng login rồi thì không yêu cầu họ login lại nữa
+        if (mAuth.getCurrentUser() != null) {
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
         database = FirebaseDatabase.getInstance().getReference("Users");
 
         emailField = findViewById(R.id.login_email);
