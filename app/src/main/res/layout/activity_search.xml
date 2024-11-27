@@ -44,7 +44,7 @@
                     android:id="@+id/SearchTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Search"
+                    android:text="@string/search"
                     android:textAppearance="@style/payment_title"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -64,11 +64,12 @@
 
             <EditText
                 android:id="@+id/search_movies"
+                android:singleLine="true"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
                 android:layout_weight="1"
-                android:hint="Search Movies..."
-                android:drawableLeft="@drawable/ic_search"
+                android:hint="@string/search_movies"
+                android:drawableStart="@drawable/ic_search"
                 android:drawablePadding="10dp"
                 android:padding="12dp"
                 android:textColor="#FFFFFF"
@@ -80,7 +81,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_clear"
-                android:contentDescription="Clear"
+                android:contentDescription="@string/clear"
                 android:background="@null"
                 android:padding="8dp" />
 
