@@ -8,7 +8,6 @@
     >
 
     <ScrollView
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#000000">
@@ -40,7 +39,7 @@
                         android:id="@+id/welcome_back"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Welcome back"
+                        android:text="@string/welcome_back"
                         android:textColor="#F2F2F2"
                         android:textSize="26sp"
                         android:textStyle="bold"
@@ -53,14 +52,15 @@
                 android:id="@+id/search_movies"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:hint="Search Movies..."
-                android:drawableLeft="@drawable/ic_search"
+                android:hint="@string/search_movies"
+                android:drawableStart="@drawable/ic_search"
                 android:drawablePadding="10dp"
                 android:padding="12dp"
                 android:textColor="#FFFFFF"
                 android:textColorHint="#CCCCCC"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/edittext_box"
+                android:focusable="false"
                 />
 
 
@@ -77,7 +77,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Now Playing"
+                android:text="@string/now_playing"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp"
                 android:layout_marginTop="24dp"
@@ -94,7 +94,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Coming Soon"
+                android:text="@string/coming_soon"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp"
                 android:layout_marginTop="24dp"
