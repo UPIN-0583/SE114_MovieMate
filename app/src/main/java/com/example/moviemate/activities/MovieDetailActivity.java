@@ -91,6 +91,7 @@ public class MovieDetailActivity extends AppCompatActivity {
             if (selectedCinema != null) {
                 Intent selectSeatIntent = new Intent(MovieDetailActivity.this, SelectSeatActivity.class);
                 selectSeatIntent.putExtra("cinema_id", selectedCinema.getCinemaID());
+                selectSeatIntent.putExtra("cinema_name", selectedCinema.getCinemaName());
                 selectSeatIntent.putExtra("movie", movie);
                 startActivity(selectSeatIntent);
             } else {
