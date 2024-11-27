@@ -1,5 +1,6 @@
 package com.example.moviemate.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.GridLayout;
@@ -7,6 +8,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -15,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.moviemate.R;
 import com.example.moviemate.adapters.DayAdapter;
 import com.example.moviemate.adapters.TimeAdapter;
+import com.example.moviemate.models.Movie;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -34,6 +38,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class SelectSeatActivity extends AppCompatActivity {
@@ -58,17 +63,22 @@ public class SelectSeatActivity extends AppCompatActivity {
     private Map<String, String> seatMap;
     private DatabaseReference cinemaRef;
     private DatabaseReference userTicketsRef;
+    private Movie movie;
     private String cinemaID;
-    private int movieID;
+    private String cinemaName;
+
+    private ActivityResultLauncher<Intent> launcher; // Launcher để gọi PaymentActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_seat);
 
-        // Nhận cinemaID và movieID từ Intent
-        cinemaID = "Cinema" + getIntent().getIntExtra("cinema_id", -1);
-        movieID = getIntent().getIntExtra("movie_id", -1);
+        Intent data = getIntent();
+        // Nhận cinemaID, cinemaName và movie từ Intent
+        cinemaID = "Cinema" + data.getIntExtra("cinema_id", -1);
+        cinemaName = data.getStringExtra("cinema_name");
+        movie = (Movie) data.getSerializableExtra("movie");
 
         // Ánh xạ các view
         backBtn = findViewById(R.id.BackBtn);
@@ -86,22 +96,47 @@ public class SelectSeatActivity extends AppCompatActivity {
 
         fetchShowTimesFromFirebase();
 
+        // Khởi tạo launcher để gọi PaymentActivity
+        initLauncher();
+
         backBtn.setOnClickListener(v -> finish());
         // Sự kiện khi nhấn nút "Mua vé"
         buyTicketButton.setOnClickListener(v -> {
             if (selectedDate == null || selectedTime == null || selectedSeats.isEmpty()) {
                 Toast.makeText(this, "Hãy chọn ngày, giờ và ít nhất một ghế", Toast.LENGTH_SHORT).show();
             } else {
-                saveTicketToFirebase();
+                Intent intent = new Intent(this, PaymentActivity.class);
+                intent.putExtra("totalPrice", totalPrice);
+                intent.putExtra("cinemaName", cinemaName);
+                intent.putExtra("movie", movie);
+                intent.putExtra("selectedDate", selectedDate);
+                intent.putExtra("selectedTime", selectedTime);
+                String seats = String.join(",", selectedSeats);
+                intent.putExtra("selectedSeats", seats);
+                launcher.launch(intent);
             }
         });
+    }
+
+    private void initLauncher() {
+        launcher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_CANCELED) return;
+
+                    Intent data = result.getData();
+                    if (data == null) return;
+
+                    saveTicketToFirebase();
+                }
+        );
     }
 
     private void fetchShowTimesFromFirebase() {
         cinemaRef = FirebaseDatabase.getInstance().getReference("Cinemas")
                 .child(cinemaID)
                 .child("Movies")
-                .child("Movie" + movieID)
+                .child("Movie" + movie.getMovieID())
                 .child("ShowTimes");
 
         cinemaRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -235,7 +270,7 @@ public class SelectSeatActivity extends AppCompatActivity {
             selectedSeats.add(seat);
             seatMap.put(seat, "selected");
         }
-        totalPriceTextView.setText("Total: " + totalPrice + " VND");
+        totalPriceTextView.setText(String.format(Locale.getDefault(), "Total: %d VND", totalPrice));
     }
 
 
@@ -243,7 +278,7 @@ public class SelectSeatActivity extends AppCompatActivity {
         String ticketId = userTicketsRef.push().getKey(); // Sử dụng TicketID làm mã định danh duy nhất cho vé
         Map<String, Object> ticketData = new HashMap<>();
         ticketData.put("cinema", cinemaID);
-        ticketData.put("movie", "Movie" + movieID);
+        ticketData.put("movie", "Movie" + movie.getMovieID());
         ticketData.put("date", selectedDate);
         ticketData.put("time", selectedTime);
         ticketData.put("seats", selectedSeats);
@@ -298,7 +333,7 @@ public class SelectSeatActivity extends AppCompatActivity {
         DatabaseReference seatsRef = FirebaseDatabase.getInstance().getReference("Cinemas")
                 .child(cinemaID)
                 .child("Movies")
-                .child("Movie" + movieID)
+                .child("Movie" + movie.getMovieID())
                 .child("ShowTimes")
                 .child(selectedDate)
                 .child(selectedTime)
