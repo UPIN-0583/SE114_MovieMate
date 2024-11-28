@@ -57,8 +57,8 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
-        // Nếu người dùng login rồi thì không yêu cầu họ login lại nữa
-        if (mAuth.getCurrentUser() != null) {
+        // Nếu người dùng login rồi và đã xác thực email thì không yêu cầu họ login lại nữa
+        if (mAuth.getCurrentUser() != null && mAuth.getCurrentUser().isEmailVerified()) {
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(intent);
             finish();
@@ -128,6 +128,12 @@ public class LoginActivity extends AppCompatActivity {
                     loginButton.setEnabled(true);
 
                     if (task.isSuccessful()) {
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null && !user.isEmailVerified()) {
+                            CustomDialog.showAlertDialog(LoginActivity.this, R.drawable.ic_error, "Error", "Please verify your email before logging in.", false);
+                            return;
+                        }
+
                         Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
