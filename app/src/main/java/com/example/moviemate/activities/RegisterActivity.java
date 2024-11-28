@@ -105,22 +105,36 @@ public class RegisterActivity extends AppCompatActivity {
         registerButton.setEnabled(false);
 
         mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(task -> {
+                .addOnCompleteListener(createUserTask -> {
                     registerButton.setEnabled(true);
-                    if (task.isSuccessful()) {
+                    if (createUserTask.isSuccessful()) {
                         FirebaseUser firebaseUser = mAuth.getCurrentUser();
                         if (firebaseUser != null) {
                             String uid = firebaseUser.getUid();
-                            User user = new User(null, null, email, null); // Khởi tạo User với avatarUrl là null
+                            String name = ((EditText) findViewById(R.id.register_name)).getText().toString().trim();
+                            User user = new User(name, null, email, null); // Khởi tạo User với avatarUrl là null
 
                             database.child(uid).setValue(user)
                                     .addOnSuccessListener(aVoid -> {
-                                        CustomDialog.showAlertDialog(RegisterActivity.this, R.drawable.ic_success, "Notice", "Registration successful", true);
+                                        firebaseUser.sendEmailVerification()
+                                                .addOnCompleteListener(sendEmailVerificationTask -> {
+                                                    if (sendEmailVerificationTask.isSuccessful()) {
+                                                        CustomDialog.showAlertDialog(
+                                                                RegisterActivity.this,
+                                                                R.drawable.ic_success,
+                                                                "Notice",
+                                                                "Registration successful. Check your email to verify.",
+                                                                true
+                                                        );
+                                                    } else {
+                                                        CustomDialog.showAlertDialog(RegisterActivity.this, R.drawable.ic_error, "Error", "Failed to send verification email. Please contact support", false);
+                                                    }
+                                                });
                                     })
                                     .addOnFailureListener(e -> Toast.makeText(RegisterActivity.this, "Failed to save user information", Toast.LENGTH_SHORT).show());
                         }
                     } else {
-                        CustomDialog.showAlertDialog(RegisterActivity.this, R.drawable.ic_error, "Error", task.getException().getMessage(), false);
+                        CustomDialog.showAlertDialog(RegisterActivity.this, R.drawable.ic_error, "Error", createUserTask.getException().getMessage(), false);
                     }
                 });
     }
