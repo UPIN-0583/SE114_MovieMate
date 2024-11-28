@@ -44,6 +44,9 @@ public class SearchActivity extends AppCompatActivity {
         clearButton = findViewById(R.id.clear_button);
         searchResultRecycler = findViewById(R.id.search_result_recycler);
 
+        // Focus vào thanh search
+        searchMovies.requestFocus();
+
         // Thiết lập RecyclerView
         searchResultRecycler.setLayoutManager(new LinearLayoutManager(this));
         filteredMovies = new ArrayList<>();
