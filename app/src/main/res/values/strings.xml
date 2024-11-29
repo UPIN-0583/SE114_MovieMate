@@ -41,4 +41,11 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="enter_your_name">Enter your name</string>
+    <string name="profile">Profile</string>
+    <string name="edit">Edit ⟩</string>
+    <string name="user_avatar">User Avatar</string>
+    <string name="your_name">Your Name</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="save">Save</string>
 </resources>
