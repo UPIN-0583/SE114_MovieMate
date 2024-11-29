@@ -27,6 +27,7 @@ import com.example.moviemate.api.objects.payos.SimpleMovieDescription;
 import com.example.moviemate.models.Movie;
 import com.example.moviemate.models.PaymentMethod;
 import com.example.moviemate.utils.CustomDialog;
+import com.example.moviemate.utils.MoneyFormatter;
 import com.example.moviemate.utils.OrderIdGenerator;
 import com.squareup.picasso.Picasso;
 
@@ -48,7 +49,6 @@ public class PaymentActivity extends AppCompatActivity {
     private Timer paymentTimer;
     private int paymentTimeLeft = PAYMENT_TIMEOUT;
     private PaymentMethodListAdapter paymentMethodListAdapter;
-    private Integer basePrice = null;
     private ActivityResultLauncher<Intent> launcher;
 
     // UI Components
@@ -60,8 +60,6 @@ public class PaymentActivity extends AppCompatActivity {
     private ImageView moviePosterImageView;
     private TextView orderIdTextView;
     private TextView seatTextView;
-    private EditText discountCodeEdit;
-    private Button applyDiscountBtn;
     private TextView totalMoneyTextView;
     private ListView paymentMethodListView;
     private TextView paymentTimeLeftTextView;
@@ -104,7 +102,7 @@ public class PaymentActivity extends AppCompatActivity {
         String date = data.getStringExtra("selectedDate");
         String time = data.getStringExtra("selectedTime");
         String seats = data.getStringExtra("selectedSeats");
-        basePrice = data.getIntExtra("totalPrice", -1);
+        String totalPrice = data.getStringExtra("totalPrice");
         if (movie == null) {
             finish();
             return;
@@ -117,7 +115,7 @@ public class PaymentActivity extends AppCompatActivity {
         cinemaNameTextView.setText(cinemaName);
         movieTimeTextView.setText(String.format("%s %s", date, time));
         seatTextView.setText(seats);
-        totalMoneyTextView.setText(formatMoney(basePrice));
+        totalMoneyTextView.setText(totalPrice);
     }
 
     private void setupLayout(){
@@ -141,8 +139,6 @@ public class PaymentActivity extends AppCompatActivity {
         moviePosterImageView = findViewById(R.id.moviePosterImageView);
         orderIdTextView = findViewById(R.id.orderIdTextView);
         seatTextView = findViewById(R.id.seatTextView);
-        discountCodeEdit = findViewById(R.id.discountCodeEdit);
-        applyDiscountBtn = findViewById(R.id.applyDiscountBtn);
         totalMoneyTextView = findViewById(R.id.totalMoneyTextView);
         paymentMethodListView = findViewById(R.id.paymentMethodListView);
         paymentTimeLeftTextView = findViewById(R.id.paymentTimeLeftTextView);
@@ -150,7 +146,6 @@ public class PaymentActivity extends AppCompatActivity {
     }
     private void setupListeners() {
         setupBackPress();
-        applyDiscountBtn.setOnClickListener(v -> applyDiscountCode());
         payBtn.setOnClickListener(v -> pay());
     }
     private void setupBackPress() {
@@ -234,7 +229,7 @@ public class PaymentActivity extends AppCompatActivity {
         final String ORDER_ID_EXIST_ERR_CODE = "231";
 
         payBtn.setEnabled(false); // Disable pay button to prevent multiple payments
-        int totalMoney = parseMoney(totalMoneyTextView.getText().toString());
+        int totalMoney = MoneyFormatter.parseMoney(this, totalMoneyTextView.getText().toString());
         if (totalMoney == 0) {
             successPayment();
             return;
@@ -307,60 +302,5 @@ public class PaymentActivity extends AppCompatActivity {
         setResult(RESULT_OK, data);
 
         CustomDialog.showAlertDialog(this, R.drawable.ic_success, "Success", "Payment successful", true);
-    }
-
-    private void applyDiscountCode() {
-        String discountCode = discountCodeEdit.getText().toString().trim();
-        if (!validateDiscountCode(discountCode)) {
-            return;
-        }
-
-        int totalMoney = calculateDiscountedAmount();
-        totalMoneyTextView.setText(formatMoney(totalMoney));
-
-        CustomDialog.showAlertDialog(this, R.drawable.ic_success, "Success", "Discount code applied successfully", false);
-    }
-    private boolean validateDiscountCode(String discountCode) {
-        if (discountCode.isEmpty()) {
-            CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Error", "Please enter discount code", false);
-            return false;
-        }
-
-        return true;
-    }
-    private int calculateDiscountedAmount() {
-        int totalMoney = parseMoney(totalMoneyTextView.getText().toString());
-
-        // Reset to base price if discount already applied
-        if (basePrice != null && totalMoney != basePrice) {
-            totalMoney = basePrice;
-        }
-
-        int discountAmount = 1;
-        // Calculate discount amount here
-
-        totalMoney -= discountAmount;
-        return totalMoney = Math.max(totalMoney, 0); // Never show negative money
-    }
-    private int parseMoney(String moneyString) {
-        NumberFormat formatter = NumberFormat.getInstance();
-
-        try {
-            Number number = formatter.parse(moneyString);
-            return Objects.requireNonNull(number).intValue();
-        } catch (Exception e) {
-            CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Error", "Invalid money format", false);
-            return basePrice;
-        }
-    }
-    private String formatMoney(int money) {
-        NumberFormat formatter = NumberFormat.getInstance();
-
-        try {
-            return formatter.format(money);
-        } catch (Exception e) {
-            CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Error", "Invalid money format", false);
-            return formatter.format(basePrice);
-        }
     }
 }

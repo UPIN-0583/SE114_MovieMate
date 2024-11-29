@@ -197,7 +197,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Total: 210,000 VND"
+            android:text="Total: 0 VND"
             android:textSize="16sp"
             android:textColor="#FFD700"
             android:layout_marginEnd="16dp" />

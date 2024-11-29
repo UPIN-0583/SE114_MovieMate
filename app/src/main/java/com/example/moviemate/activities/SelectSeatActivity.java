@@ -19,6 +19,7 @@ import com.example.moviemate.R;
 import com.example.moviemate.adapters.DayAdapter;
 import com.example.moviemate.adapters.TimeAdapter;
 import com.example.moviemate.models.Movie;
+import com.example.moviemate.utils.MoneyFormatter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -103,10 +104,10 @@ public class SelectSeatActivity extends AppCompatActivity {
         // Sự kiện khi nhấn nút "Mua vé"
         buyTicketButton.setOnClickListener(v -> {
             if (selectedDate == null || selectedTime == null || selectedSeats.isEmpty()) {
-                Toast.makeText(this, "Hãy chọn ngày, giờ và ít nhất một ghế", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Please select at least one date and one seat.", Toast.LENGTH_SHORT).show();
             } else {
                 Intent intent = new Intent(this, PaymentActivity.class);
-                intent.putExtra("totalPrice", totalPrice);
+                intent.putExtra("totalPrice", MoneyFormatter.formatMoney(this, totalPrice));
                 intent.putExtra("cinemaName", cinemaName);
                 intent.putExtra("movie", movie);
                 intent.putExtra("selectedDate", selectedDate);
@@ -156,7 +157,7 @@ public class SelectSeatActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(SelectSeatActivity.this, "Lỗi khi lấy giờ chiếu từ Firebase", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SelectSeatActivity.this, "Failed to fetch showtime from Firebase", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -186,7 +187,7 @@ public class SelectSeatActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(SelectSeatActivity.this, "Lỗi khi lấy giờ chiếu", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SelectSeatActivity.this, "Failed to fetch date from Firebase", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -221,7 +222,7 @@ public class SelectSeatActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(SelectSeatActivity.this, "Lỗi khi lấy thông tin ghế", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SelectSeatActivity.this, "Failed to fetch seats from Firebase", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -247,14 +248,14 @@ public class SelectSeatActivity extends AppCompatActivity {
                     if (status.equals("available")) {
                         toggleSeatSelection(seatTextView, seat);
                     } else {
-                        Toast.makeText(this, "Ghế này đã được đặt", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "The seat has been reserved.", Toast.LENGTH_SHORT).show();
                     }
                 });
 
                 seatGridLayout.addView(seatTextView);
             }
         } else {
-            Toast.makeText(this, "Không có thông tin ghế khả dụng", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No seat available", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -272,7 +273,7 @@ public class SelectSeatActivity extends AppCompatActivity {
             selectedSeats.add(seat);
             seatMap.put(seat, "selected");
         }
-        totalPriceTextView.setText(String.format(Locale.getDefault(), "Total: %d VND", totalPrice));
+        totalPriceTextView.setText(String.format(Locale.getDefault(), "Total: %s VND", MoneyFormatter.formatMoney(this, totalPrice)));
     }
 
 
@@ -291,7 +292,7 @@ public class SelectSeatActivity extends AppCompatActivity {
         if (barcodeBitmap != null) {
             uploadBarcodeToFirebase(barcodeBitmap, ticketId, ticketData);
         } else {
-            Toast.makeText(this, "Không thể tạo mã vạch", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Failed to create bar code", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -323,11 +324,10 @@ public class SelectSeatActivity extends AppCompatActivity {
             userTicketsRef.child(ticketId).setValue(ticketData)
                     .addOnSuccessListener(aVoid -> {
                         updateSeatStatus();
-                        Toast.makeText(this, "Đặt vé thành công! Tổng cộng: " + totalPrice + " VND", Toast.LENGTH_SHORT).show();
                     })
-                    .addOnFailureListener(e -> Toast.makeText(this, "Lỗi khi lưu vé", Toast.LENGTH_SHORT).show());
+                    .addOnFailureListener(e -> Toast.makeText(this, "Failed to save ticket. Please contact support", Toast.LENGTH_SHORT).show());
         })).addOnFailureListener(e -> {
-            Toast.makeText(this, "Lỗi khi tải mã vạch", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Failed to load bar code", Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -344,7 +344,7 @@ public class SelectSeatActivity extends AppCompatActivity {
         for (String seat : selectedSeats) {
             seatsRef.child(seat).setValue("booked")
                     .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Lỗi khi cập nhật trạng thái ghế", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Failed to update seat status", Toast.LENGTH_SHORT).show();
                     });
         }
     }

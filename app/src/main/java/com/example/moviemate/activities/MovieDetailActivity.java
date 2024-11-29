@@ -181,7 +181,6 @@ public class MovieDetailActivity extends AppCompatActivity {
             // Lưu rạp được chọn
             CinemaAdapter cinemaAdapter = new CinemaAdapter(this, cinemaList, cinema -> {
                 selectedCinema = cinema; // Lưu rạp được chọn
-                Toast.makeText(MovieDetailActivity.this, "Selected cinema: " + cinema.getCinemaName(), Toast.LENGTH_SHORT).show();
             });
             cinemaRecyclerView.setAdapter(cinemaAdapter);
             cinemaRecyclerView.setVisibility(View.VISIBLE);

@@ -1,5 +1,8 @@
 package com.example.moviemate.activities;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -10,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.moviemate.R;
@@ -21,19 +25,27 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class UpdateProfileActivity extends AppCompatActivity {
+    private static final int PICK_IMAGE_REQUEST = 1;
 
     private ImageButton backBtn;
     private EditText editTextName, editTextPhone;
     private Button buttonSave;
+    private ImageButton buttonChooseImage;
     private ImageView avatarImageView;
     private DatabaseReference database;
     private FirebaseAuth auth;
+    private StorageReference storageReference;
+
+    private Uri imageUri;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +56,9 @@ public class UpdateProfileActivity extends AppCompatActivity {
         editTextName = findViewById(R.id.editTextName);
         editTextPhone = findViewById(R.id.editTextPhone);
         buttonSave = findViewById(R.id.buttonSave);
+        buttonChooseImage = findViewById(R.id.buttonChooseImage);
         avatarImageView = findViewById(R.id.imageViewAvatar);
+        storageReference = FirebaseStorage.getInstance().getReference("avatars");
 
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance().getReference("Users");
@@ -55,6 +69,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
         }
 
         buttonSave.setOnClickListener(v -> saveUserInfo());
+        buttonChooseImage.setOnClickListener(v -> openFileChooser());
         backBtn.setOnClickListener(v -> finish());
     }
 
@@ -79,12 +94,49 @@ public class UpdateProfileActivity extends AppCompatActivity {
         });
     }
 
+    private void openFileChooser() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Chọn ảnh"), PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
+            imageUri = data.getData();
+            uploadImageToFirebase();
+        }
+    }
+
+    private void uploadImageToFirebase() {
+        if (imageUri != null) {
+            FirebaseUser user = auth.getCurrentUser();
+            if (user != null) {
+                StorageReference fileReference = storageReference.child(user.getUid() + ".jpg");
+                fileReference.putFile(imageUri)
+                        .addOnSuccessListener(taskSnapshot -> fileReference.getDownloadUrl().addOnSuccessListener(uri -> {
+                            String imageUrl = uri.toString();
+                            saveAvatarUrlToDatabase(user.getUid(), imageUrl);
+                            Picasso.get().load(imageUrl).into(avatarImageView); // Hiển thị ảnh mới bằng Picasso
+                            Toast.makeText(this, "Avatar uploaded successfully", Toast.LENGTH_SHORT).show();
+                        }))
+                        .addOnFailureListener(e -> Toast.makeText(this, "Failed to upload avatar", Toast.LENGTH_SHORT).show());
+            }
+        }
+    }
+
+    private void saveAvatarUrlToDatabase(String uid, String imageUrl) {
+        database.child("Users").child(uid).child("avatarUrl").setValue(imageUrl);
+    }
+
     private void saveUserInfo() {
         String name = editTextName.getText().toString().trim();
         String phone = editTextPhone.getText().toString().trim();
 
         if (TextUtils.isEmpty(name) || TextUtils.isEmpty(phone)) {
-            Toast.makeText(this, "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please fill all information", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -100,11 +152,11 @@ public class UpdateProfileActivity extends AppCompatActivity {
             // Cập nhật chỉ những giá trị cần thiết vào Firebase Database
             database.child(uid).updateChildren(updates)
                     .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(UpdateProfileActivity.this, "Cập nhật thông tin thành công", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(UpdateProfileActivity.this, "Profile updated", Toast.LENGTH_SHORT).show();
                         finish(); // Đóng Activity sau khi lưu
                     })
                     .addOnFailureListener(e -> {
-                        Toast.makeText(UpdateProfileActivity.this, "Cập nhật thất bại", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(UpdateProfileActivity.this, "Failed to update profile", Toast.LENGTH_SHORT).show();
                     });
         }
     }
