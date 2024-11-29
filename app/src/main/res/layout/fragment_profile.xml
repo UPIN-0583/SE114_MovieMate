@@ -103,17 +103,6 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="10dp"
-        android:layout_marginTop="28dp"
-        android:text="Upload Avatar"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout7"
-        tools:layout_editor_absoluteX="237dp" />
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/changePasswordLayout"
         android:layout_width="0dp"
