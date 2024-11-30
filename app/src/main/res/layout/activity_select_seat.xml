@@ -94,24 +94,35 @@
         android:contentDescription="Screen Image" />
 
     <!-- Seat Grid Layout -->
-    <GridLayout
-        android:id="@+id/seat_grid_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/seat_section"
         android:layout_below="@id/screen_image"
-        android:columnCount="8"
-        android:padding="8dp"
-        android:layout_marginTop="8dp">
-        <!-- Ghế sẽ được thêm vào programmatically -->
-    </GridLayout>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <GridLayout
+            android:id="@+id/seat_grid_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:columnCount="9"
+            android:padding="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+            <!-- Ghế sẽ được thêm vào programmatically -->
+        </GridLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <!-- Legend for Seat Colors -->
     <LinearLayout
         android:id="@+id/legend_section"
-        android:layout_width="300dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_below="@id/seat_grid_layout"
+        android:layout_below="@id/seat_section"
         android:layout_above="@id/bottom_section"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
