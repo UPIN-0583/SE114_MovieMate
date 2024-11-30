@@ -38,6 +38,7 @@ import java.io.ByteArrayOutputStream;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -201,10 +202,10 @@ public class SelectSeatActivity extends AppCompatActivity {
     }
 
     private void fetchSeatsForSelectedTime(String date, String time) {
-        cinemaRef.child(date).child(time).addListenerForSingleValueEvent(new ValueEventListener() {
+        cinemaRef.child(date).child(time).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                seatMap = new HashMap<>();
+                seatMap = new LinkedHashMap<>(); // Giữ nguyên thứ tự ghế khi trả về từ Firebase
                 Integer priceFromDb = snapshot.child("Price").getValue(Integer.class);
                 if (priceFromDb != null) {
                     seatPrice = priceFromDb;
@@ -242,12 +243,19 @@ public class SelectSeatActivity extends AppCompatActivity {
                 params.setMargins(16, 16, 16, 16);
                 seatTextView.setLayoutParams(params);
 
-                seatTextView.setBackgroundResource(status.equals("available") ? R.color.available_seat : R.color.reserved_seat);
+                if (selectedSeats.contains(seat)) {
+                    seatTextView.setSelected(true);
+                    seatTextView.setBackgroundResource(R.color.selected_seat);
+                } else {
+                    seatTextView.setSelected(false);
+                    seatTextView.setBackgroundResource(status.equals("available") ? R.color.available_seat : R.color.reserved_seat);
+                }
                 seatTextView.setTextColor(getResources().getColor(android.R.color.white));
                 seatTextView.setOnClickListener(v -> {
-                    if (status.equals("available")) {
+                    if (status.equals("available") || selectedSeats.contains(seat)) {
                         toggleSeatSelection(seatTextView, seat);
-                    } else {
+                    }
+                    else {
                         Toast.makeText(this, "The seat has been reserved.", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -260,19 +268,32 @@ public class SelectSeatActivity extends AppCompatActivity {
     }
 
     private void toggleSeatSelection(TextView seatTextView, String seat) {
+        DatabaseReference seatRef = FirebaseDatabase.getInstance().getReference("Cinemas")
+                .child(cinemaID)
+                .child("Movies")
+                .child("Movie" + movie.getMovieID())
+                .child("ShowTimes")
+                .child(selectedDate)
+                .child(selectedTime)
+                .child("Seats")
+                .child(seat);
+
         if (seatTextView.isSelected()) {
             seatTextView.setSelected(false);
             seatTextView.setBackgroundResource(R.color.available_seat);
             totalPrice -= seatPrice;
             selectedSeats.remove(seat);
             seatMap.put(seat, "available");
+            seatRef.setValue("available");
         } else {
             seatTextView.setSelected(true);
             seatTextView.setBackgroundResource(R.color.selected_seat);
             totalPrice += seatPrice;
             selectedSeats.add(seat);
             seatMap.put(seat, "selected");
+            seatRef.setValue("booked");
         }
+
         totalPriceTextView.setText(String.format(Locale.getDefault(), "Total: %s VND", MoneyFormatter.formatMoney(this, totalPrice)));
     }
 
