@@ -193,7 +193,7 @@
     </LinearLayout>
 
     <!-- Bottom Section: Total Price and Purchase Button -->
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_section"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -203,27 +203,56 @@
         android:background="#3b221f"
         android:padding="16dp">
 
-        <TextView
-            android:id="@+id/total_price"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Total: 0 VND"
-            android:textSize="16sp"
-            android:textColor="#FFD700"
-            android:layout_marginEnd="16dp" />
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/total_price"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginEnd="16dp"
+                android:layout_weight="1"
+                android:text="Total: 0 VND"
+                android:textColor="#FFD700"
+                android:textSize="16sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/complete_in" />
+
+                <TextView
+                    android:id="@+id/time_left"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" 00:00" />
+            </LinearLayout>
+        </LinearLayout>
+
 
         <Button
             android:id="@+id/buy_ticket_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/buy_ticket"
+            android:layout_gravity="end"
             android:backgroundTint="#FFD700"
-            android:textColor="#000000"
             android:paddingStart="24dp"
             android:paddingEnd="24dp"
+            android:text="@string/buy_ticket"
+            android:textColor="#000000"
             android:textStyle="bold"
-            android:layout_gravity="end" />
-    </LinearLayout>
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </RelativeLayout>
