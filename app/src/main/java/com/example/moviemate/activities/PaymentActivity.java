@@ -44,10 +44,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class PaymentActivity extends AppCompatActivity {
-    private static final int PAYMENT_TIMEOUT = 600000; // 10 minutes
-
     private Timer paymentTimer;
-    private int paymentTimeLeft = PAYMENT_TIMEOUT;
+    private int paymentTimeLeft;
     private PaymentMethodListAdapter paymentMethodListAdapter;
     private ActivityResultLauncher<Intent> launcher;
 
@@ -72,8 +70,8 @@ public class PaymentActivity extends AppCompatActivity {
         initializeViews();
         setupListeners();
         initPaymentMethods();
-        startPaymentTimer();
         setData();
+        startPaymentTimer();
 
         launcher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -103,6 +101,7 @@ public class PaymentActivity extends AppCompatActivity {
         String time = data.getStringExtra("selectedTime");
         String seats = data.getStringExtra("selectedSeats");
         String totalPrice = data.getStringExtra("totalPrice");
+        paymentTimeLeft = data.getIntExtra("timeLeft", 0);
         if (movie == null) {
             finish();
             return;
@@ -237,7 +236,7 @@ public class PaymentActivity extends AppCompatActivity {
 
         int quantity = (int) (seatTextView.getText().toString().chars().filter(ch -> ch == ',').count() + 1);
         SimpleMovieDescription movieDescription = new SimpleMovieDescription(movieTitleTextView.getText().toString(), quantity, totalMoney);
-        long expiredAt = (System.currentTimeMillis() / 1000) + (PAYMENT_TIMEOUT / 1000);
+        long expiredAt = (System.currentTimeMillis() / 1000) + (paymentTimeLeft / 1000);
 
         int orderId = Integer.parseInt(orderIdTextView.getText().toString());
         // Change 2000 to totalMoney when in real use
