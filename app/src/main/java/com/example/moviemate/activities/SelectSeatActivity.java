@@ -8,6 +8,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -19,6 +20,7 @@ import com.example.moviemate.R;
 import com.example.moviemate.adapters.DayAdapter;
 import com.example.moviemate.adapters.TimeAdapter;
 import com.example.moviemate.models.Movie;
+import com.example.moviemate.utils.CustomDialog;
 import com.example.moviemate.utils.MoneyFormatter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -42,13 +44,17 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class SelectSeatActivity extends AppCompatActivity {
-
+    private int totalTimeLeft = 1200000; // Tổng thời gian đặt ghế, thanh toán là 20 phút
+    private Timer timer;
     private ImageButton backBtn;
     private RecyclerView dateRecyclerView, timeRecyclerView;
     private GridLayout seatGridLayout;
     private TextView totalPriceTextView;
+    private TextView timeLeftTextView;
     private Button buyTicketButton;
 
     private DayAdapter dayAdapter;
@@ -88,6 +94,7 @@ public class SelectSeatActivity extends AppCompatActivity {
         timeRecyclerView = findViewById(R.id.time_recycler_view);
         seatGridLayout = findViewById(R.id.seat_grid_layout);
         totalPriceTextView = findViewById(R.id.total_price);
+        timeLeftTextView = findViewById(R.id.time_left);
         buyTicketButton = findViewById(R.id.buy_ticket_button);
 
         dateRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -101,7 +108,12 @@ public class SelectSeatActivity extends AppCompatActivity {
         // Khởi tạo launcher để gọi PaymentActivity
         initLauncher();
 
-        backBtn.setOnClickListener(v -> finish());
+        // Bắt đầu đếm ngược thời gian
+        startTimer();
+
+        // Sự kiện khi nhấn nút "Quay lại"
+        setupBackEvent();
+
         // Sự kiện khi nhấn nút "Mua vé"
         buyTicketButton.setOnClickListener(v -> {
             if (selectedDate == null || selectedTime == null || selectedSeats.isEmpty()) {
@@ -115,7 +127,21 @@ public class SelectSeatActivity extends AppCompatActivity {
                 intent.putExtra("selectedTime", selectedTime);
                 String seats = String.join(",", selectedSeats);
                 intent.putExtra("selectedSeats", seats);
+                intent.putExtra("timeLeft", totalTimeLeft);
                 launcher.launch(intent);
+            }
+        });
+    }
+
+    private void setupBackEvent() {
+        backBtn.setOnClickListener(v -> {
+            cancelHolding();
+        });
+
+        getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                cancelHolding();
             }
         });
     }
@@ -297,7 +323,6 @@ public class SelectSeatActivity extends AppCompatActivity {
         totalPriceTextView.setText(String.format(Locale.getDefault(), "Total: %s VND", MoneyFormatter.formatMoney(this, totalPrice)));
     }
 
-
     private void saveTicketToFirebase() {
         String ticketId = userTicketsRef.push().getKey(); // Sử dụng TicketID làm mã định danh duy nhất cho vé
         Map<String, Object> ticketData = new HashMap<>();
@@ -370,4 +395,55 @@ public class SelectSeatActivity extends AppCompatActivity {
         }
     }
 
+    // Huỷ giữ chỗ khi bấm back hoặc hết thời gian
+    private void cancelHolding() {
+        DatabaseReference seatRef = FirebaseDatabase.getInstance().getReference("Cinemas")
+                .child(cinemaID)
+                .child("Movies")
+                .child("Movie" + movie.getMovieID())
+                .child("ShowTimes")
+                .child(selectedDate)
+                .child(selectedTime)
+                .child("Seats");
+
+        for (String seat : selectedSeats) {
+            seatRef.child(seat).setValue("available")
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this, "Failed to restore seat status", Toast.LENGTH_SHORT).show();
+                    });
+        }
+
+        timer.cancel();
+    }
+
+    // Countdown timer
+    private void startTimer() {
+        timer = new Timer();
+        timer.schedule(new SelectSeatCountdown(), 0, 1000);
+    }
+
+    public class SelectSeatCountdown extends TimerTask {
+        @Override
+        public void run() {
+            totalTimeLeft -= 1000; // Giảm thời gian còn lại mỗi giây
+            totalTimeLeft = Math.max(totalTimeLeft, 0); // Đảm bảo thời gian còn lại không âm
+            final int minutes = Math.max((totalTimeLeft / 1000) / 60, 0);
+            final int seconds = Math.max((totalTimeLeft / 1000) % 60, 0);
+
+            runOnUiThread(() -> {
+                timeLeftTextView.setText(String.format(Locale.getDefault(), " %02d:%02d", minutes, seconds));
+            });
+
+            if (totalTimeLeft <= 0) {
+                handleTimeout();
+            }
+        }
+    }
+
+    private void handleTimeout() {
+        runOnUiThread(() -> {
+            cancelHolding();
+            CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Time's up!", "Your seat reservation has been cancelled.", true);
+        });
+    }
 }
