@@ -53,4 +53,5 @@
     <string name="reserved">Reserved</string>
     <string name="selected">Selected</string>
     <string name="buy_ticket">Buy Ticket</string>
+    <string name="complete_in">Complete in</string>
 </resources>
