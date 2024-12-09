@@ -48,4 +48,10 @@
     <string name="phone_number">Phone Number</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="save">Save</string>
+    <string name="select_date_time">Select Date Time</string>
+    <string name="available">Available</string>
+    <string name="reserved">Reserved</string>
+    <string name="selected">Selected</string>
+    <string name="buy_ticket">Buy Ticket</string>
+    <string name="complete_in">Complete in</string>
 </resources>

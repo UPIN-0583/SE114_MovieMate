@@ -37,7 +37,7 @@
                 android:id="@+id/SelectDateTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Select Date Time"
+                android:text="@string/select_date_time"
                 android:textAppearance="@style/payment_title"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -94,24 +94,35 @@
         android:contentDescription="Screen Image" />
 
     <!-- Seat Grid Layout -->
-    <GridLayout
-        android:id="@+id/seat_grid_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/seat_section"
         android:layout_below="@id/screen_image"
-        android:columnCount="8"
-        android:padding="8dp"
-        android:layout_marginTop="8dp">
-        <!-- Ghế sẽ được thêm vào programmatically -->
-    </GridLayout>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <GridLayout
+            android:id="@+id/seat_grid_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:columnCount="9"
+            android:padding="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+            <!-- Ghế sẽ được thêm vào programmatically -->
+        </GridLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <!-- Legend for Seat Colors -->
     <LinearLayout
         android:id="@+id/legend_section"
-        android:layout_width="300dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_below="@id/seat_grid_layout"
+        android:layout_below="@id/seat_section"
         android:layout_above="@id/bottom_section"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
@@ -132,7 +143,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Available"
+                android:text="@string/available"
                 android:textColor="#FFFFFF"
                 android:textSize="14sp"
                 android:gravity="center"
@@ -153,7 +164,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Reserved"
+                android:text="@string/reserved"
                 android:textColor="#FFFFFF"
                 android:textSize="14sp"
                 android:gravity="center"
@@ -173,7 +184,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Selected"
+                android:text="@string/selected"
                 android:textColor="#FFD700"
                 android:textSize="14sp"
                 android:gravity="center"
@@ -182,7 +193,7 @@
     </LinearLayout>
 
     <!-- Bottom Section: Total Price and Purchase Button -->
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_section"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -192,27 +203,56 @@
         android:background="#3b221f"
         android:padding="16dp">
 
-        <TextView
-            android:id="@+id/total_price"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Total: 0 VND"
-            android:textSize="16sp"
-            android:textColor="#FFD700"
-            android:layout_marginEnd="16dp" />
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/total_price"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginEnd="16dp"
+                android:layout_weight="1"
+                android:text="Total: 0 VND"
+                android:textColor="#FFD700"
+                android:textSize="16sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/complete_in" />
+
+                <TextView
+                    android:id="@+id/time_left"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" 00:00" />
+            </LinearLayout>
+        </LinearLayout>
+
 
         <Button
             android:id="@+id/buy_ticket_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Buy Ticket"
+            android:layout_gravity="end"
             android:backgroundTint="#FFD700"
-            android:textColor="#000000"
             android:paddingStart="24dp"
             android:paddingEnd="24dp"
+            android:text="@string/buy_ticket"
+            android:textColor="#000000"
             android:textStyle="bold"
-            android:layout_gravity="end" />
-    </LinearLayout>
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </RelativeLayout>
