@@ -18,6 +18,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.example.moviemate.R;
+import com.example.moviemate.activities.ChangePasswordActivity;
+import com.example.moviemate.activities.LoginActivity;
 import com.example.moviemate.activities.UpdateProfileActivity;
 import com.example.moviemate.models.User;
 import com.google.firebase.auth.FirebaseAuth;
@@ -67,9 +69,19 @@ public class ProfileFragment extends Fragment {
 
         ConstraintLayout changePasswordLayout = view.findViewById(R.id.changePasswordLayout);
         changePasswordLayout.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Chức năng đang được phát triển", Toast.LENGTH_SHORT).show();
+            changePassword();
+        });
+
+        ConstraintLayout logoutLayout = view.findViewById(R.id.logoutLayout);
+        logoutLayout.setOnClickListener(v -> {
+            logout();
         });
         return view;
+    }
+
+    private void changePassword() {
+        Intent intent = new Intent(getActivity(), ChangePasswordActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -81,15 +93,26 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    private void logout() {
+        auth.signOut();
+        Intent intent = new Intent(getActivity(), LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+
+        if (getActivity() != null) {
+            getActivity().finish();
+        }
+    }
+
     private void loadUserInfo(String uid) {
         database.child("Users").child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User userInfo = snapshot.getValue(User.class);
                 if (userInfo != null) {
-                    if (userInfo.name == null )  nameTextView.setText("Null");
+                    if (userInfo.name == null )  nameTextView.setText(R.string.not_set_yet);
                     else nameTextView.setText(userInfo.name);
-                    if (userInfo.phone == null) phoneTextView.setText("Null");
+                    if (userInfo.phone == null) phoneTextView.setText(R.string.not_set_yet);
                     else phoneTextView.setText(userInfo.phone);
                     emailTextView.setText(userInfo.email);
 
