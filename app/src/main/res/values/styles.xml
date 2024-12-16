@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="payment_title">
+    <style name="title">
         <item name="android:textSize">28sp</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:fontFamily">@font/sf_pro</item>
