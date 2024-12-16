@@ -178,7 +178,6 @@ public class LoginActivity extends AppCompatActivity {
                         if (user != null) {
                             checkAndSaveUserToDatabase(user);
                         }
-                        Toast.makeText(LoginActivity.this, "Google sign-in successful", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
                         finish(); // Đóng LoginActivity sau khi đăng nhập thành công
