@@ -63,7 +63,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         cinemaSectionTitle = findViewById(R.id.cinema_section_title);
         continueButton = findViewById(R.id.continue_button);
 
-        // Nhận movie_id từ Intent
+        // Nhận movie từ Intent
         Intent intent = getIntent();
         movie = (Movie) intent.getSerializableExtra("movie"); // Lấy movie object từ Intent
 
