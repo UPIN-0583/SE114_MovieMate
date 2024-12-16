@@ -28,11 +28,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class ProfileFragment extends Fragment {
 
 
     private TextView nameTextView, phoneTextView, emailTextView;
-    private ImageView avatarImageView;
+    private CircleImageView avatarImageView;
     private DatabaseReference database;
     private FirebaseAuth auth;
 

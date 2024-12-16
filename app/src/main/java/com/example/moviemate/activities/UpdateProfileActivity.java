@@ -32,6 +32,8 @@ import com.squareup.picasso.Picasso;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class UpdateProfileActivity extends AppCompatActivity {
     private static final int PICK_IMAGE_REQUEST = 1;
 
@@ -39,7 +41,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
     private EditText editTextName, editTextPhone;
     private Button buttonSave;
     private ImageButton buttonChooseImage;
-    private ImageView avatarImageView;
+    private CircleImageView avatarImageView;
     private DatabaseReference database;
     private FirebaseAuth auth;
     private StorageReference storageReference;
