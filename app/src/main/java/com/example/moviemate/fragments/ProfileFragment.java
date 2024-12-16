@@ -1,13 +1,10 @@
 package com.example.moviemate.fragments;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,8 +26,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 public class ProfileFragment extends Fragment {
@@ -105,7 +100,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void loadUserInfo(String uid) {
-        database.child("Users").child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+        database.child("Users").child(uid).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User userInfo = snapshot.getValue(User.class);
@@ -121,13 +116,13 @@ public class ProfileFragment extends Fragment {
                         Picasso.get().load(userInfo.avatarUrl).into(avatarImageView);
                     }
                 } else {
-                    Toast.makeText(getActivity(), "Không thể tải thông tin người dùng", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Failed to load user information", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getActivity(), "Lỗi khi tải thông tin", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Failed to load information", Toast.LENGTH_SHORT).show();
             }
         });
     }
