@@ -31,9 +31,10 @@ import com.google.firebase.auth.UserInfo;
 public class ChangePasswordActivity extends AppCompatActivity {
     private EditText currentPasswordEditText, newPasswordEditText, confirmPasswordEditText;
     private Button changePasswordButton;
-
     private boolean passwordVisible = false;
     private ImageButton showHideCurrentPasswordImageButton, showHideNewPasswordImageButton, showHideConfirmPasswordImageButton;
+
+    private ImageButton backButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,17 +60,20 @@ public class ChangePasswordActivity extends AppCompatActivity {
         showHideConfirmPasswordImageButton = findViewById(R.id.showHideConfirmPasswordImageButton);
         showHideConfirmPasswordImageButton.setOnClickListener(v -> showHidePassword());
 
-        UserInfo user = FirebaseAuth.getInstance().getCurrentUser();
+        backButton = findViewById(R.id.backButton);
+        backButton.setOnClickListener(v -> finish());
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         if (user == null) {
             // User is not signed in
             return;
         }
 
-        String providerId = user.getProviderId();
-
-        if (providerId.equals(GoogleAuthProvider.PROVIDER_ID)) {
-            CustomDialog.showAlertDialog(this, R.drawable.ic_notice, "Notice", "You are signed in with Google. You cannot change your password.", true);
+        for (UserInfo userInfo : user.getProviderData()) {
+            if (GoogleAuthProvider.PROVIDER_ID.equals(userInfo.getProviderId())) {
+                CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Error", "You are signed in with Google. Please change your password in your Google account", true);
+            }
         }
     }
 
