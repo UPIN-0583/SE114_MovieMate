@@ -106,6 +106,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
             imageUri = data.getData();
+            Picasso.get().load(imageUri).into(avatarImageView); // Hiển thị ảnh mới bằng Picasso
             uploadImageToFirebase();
         }
     }
@@ -119,7 +120,6 @@ public class UpdateProfileActivity extends AppCompatActivity {
                         .addOnSuccessListener(taskSnapshot -> fileReference.getDownloadUrl().addOnSuccessListener(uri -> {
                             String imageUrl = uri.toString();
                             saveAvatarUrlToDatabase(user.getUid(), imageUrl);
-                            Picasso.get().load(imageUrl).into(avatarImageView); // Hiển thị ảnh mới bằng Picasso
                             Toast.makeText(this, "Avatar uploaded successfully", Toast.LENGTH_SHORT).show();
                         }))
                         .addOnFailureListener(e -> Toast.makeText(this, "Failed to upload avatar", Toast.LENGTH_SHORT).show());
@@ -128,7 +128,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
     }
 
     private void saveAvatarUrlToDatabase(String uid, String imageUrl) {
-        database.child("Users").child(uid).child("avatarUrl").setValue(imageUrl);
+        database.child(uid).child("avatarUrl").setValue(imageUrl);
     }
 
     private void saveUserInfo() {
@@ -158,6 +158,8 @@ public class UpdateProfileActivity extends AppCompatActivity {
                     .addOnFailureListener(e -> {
                         Toast.makeText(UpdateProfileActivity.this, "Failed to update profile", Toast.LENGTH_SHORT).show();
                     });
+
+            uploadImageToFirebase(); // Tải ảnh lên Firebase Storage
         }
     }
 }
