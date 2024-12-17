@@ -44,9 +44,19 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
         // Kiểm tra danh sách thể loại có null hoặc rỗng không
         List<String> genres = movie.getGenre();
-        holder.genre.setText(genres != null && !genres.isEmpty()
-                ? String.join(", ", genres)
-                : "Không có thể loại"); // Chuỗi mặc định nếu thể loại trống
+        String genreString = "";
+
+        if (genres == null || genres.isEmpty())
+            genreString = "No genre";
+        else
+            genreString = String.join(", ", genres);
+
+        int MAX_GENRE_LENGTH = 20;
+        if (genreString.length() > MAX_GENRE_LENGTH) {
+            genreString = genreString.substring(0, MAX_GENRE_LENGTH - 3) + "...";
+        }
+
+        holder.genre.setText(genreString);
 
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, MovieDetailActivity.class);
