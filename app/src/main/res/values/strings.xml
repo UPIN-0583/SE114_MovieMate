@@ -69,4 +69,5 @@
     <string name="director">Director</string>
     <string name="actor">Actor</string>
     <string name="cinema">Cinema</string>
+    <string name="hi_user">Hi, User</string>
 </resources>
