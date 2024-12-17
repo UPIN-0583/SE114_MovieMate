@@ -9,8 +9,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.splashscreen.SplashScreen;
 
@@ -29,8 +29,11 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -129,14 +132,38 @@ public class LoginActivity extends AppCompatActivity {
 
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
-                        if (user != null && !user.isEmailVerified()) {
+                        if (user == null)
+                            return;
+
+                        if (!user.isEmailVerified()) {
                             CustomDialog.showAlertDialog(LoginActivity.this, R.drawable.ic_error, "Error", "Please verify your email before logging in.", false);
                             return;
                         }
 
-                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finish(); // Prevent user from going back to login screen
+                        DatabaseReference userRef = database.child(user.getUid());
+                        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                User user = snapshot.getValue(User.class);
+                                if (user == null)
+                                    return;
+
+                                if (user.role.equals("admin")) {
+                                    // TODO: DO SOMETHING HERE
+                                    finish();
+                                }
+                                else {
+                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                    startActivity(intent);
+                                    finish(); // Prevent user from going back to login screen
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                Log.d("[MOVIEMATE LOGIN]", "Failed to query user");
+                            }
+                        });
                     } else {
                         CustomDialog.showAlertDialog(LoginActivity.this, R.drawable.ic_error, "Error", "Login failed: " + task.getException().getMessage(), false);
                     }
@@ -197,7 +224,7 @@ public class LoginActivity extends AppCompatActivity {
                 // Nếu người dùng chưa tồn tại trong Database, tạo bản ghi mới
                 String email = firebaseUser.getEmail();
                 String name = firebaseUser.getDisplayName();
-                User user = new User(name, null, email, null); // Chỉ lưu name và email
+                User user = new User(name, null, email, null, "user");
 
                 userRef.setValue(user)
                         .addOnSuccessListener(aVoid -> Log.d("LoginActivity", "User saved to database"))
