@@ -105,9 +105,9 @@ public class HomeFragment extends Fragment {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     String userName = snapshot.getValue(String.class);
                     if (userName != null) {
-                        userNameTextView.setText("Hi, " + userName);
+                        userNameTextView.setText(String.format("Hi, %s", userName));
                     } else {
-                        userNameTextView.setText("Hi, User");
+                        userNameTextView.setText(R.string.hi_user);
                     }
                 }
 
