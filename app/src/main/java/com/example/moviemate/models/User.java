@@ -1,6 +1,8 @@
 package com.example.moviemate.models;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     public String name;
     public String phone;
     public String email;
