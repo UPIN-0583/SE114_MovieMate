@@ -32,7 +32,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ProfileFragment extends Fragment {
 
-
     private TextView nameTextView, phoneTextView, emailTextView;
     private CircleImageView avatarImageView;
     private DatabaseReference database;
@@ -81,24 +80,12 @@ public class ProfileFragment extends Fragment {
         startActivity(intent);
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        FirebaseUser user = auth.getCurrentUser();
-        if (user != null) {
-            loadUserInfo(user.getUid()); // Tải lại thông tin khi ProfileFragment được hiển thị lại
-        }
-    }
-
     private void logout() {
         auth.signOut();
-        Intent intent = new Intent(getActivity(), LoginActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
 
-        if (getActivity() != null) {
-            getActivity().finish();
-        }
+        Intent intent = new Intent(requireActivity(), LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     private void loadUserInfo(String uid) {
