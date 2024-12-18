@@ -54,8 +54,8 @@ public class Movie2Adapter extends RecyclerView.Adapter<Movie2Adapter.MovieViewH
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, MovieDetailActivity.class);
 
-            // Truyền movie_id qua Intent
-            intent.putExtra("movie_id", movie.getMovieID());
+            // Truyền movie qua Intent
+            intent.putExtra("movie", movie);
 
             // Khởi chạy MovieDetailActivity
             context.startActivity(intent);

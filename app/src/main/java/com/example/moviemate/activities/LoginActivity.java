@@ -9,8 +9,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.splashscreen.SplashScreen;
 
@@ -24,46 +24,53 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Firebase;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class LoginActivity extends AppCompatActivity {
-
+    private AtomicBoolean isDataLoaded = new AtomicBoolean(false);
     private EditText emailField, passwordField;
     private FirebaseAuth mAuth;
     private static final int RC_SIGN_IN = 9001;
     private GoogleSignInClient mGoogleSignInClient;
-    private DatabaseReference database;
+    private DatabaseReference userRef;
     private boolean passwordVisible = false;
     private ImageButton showHidePasswordButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
-        splashScreen.setKeepOnScreenCondition(new SplashScreen.KeepOnScreenCondition() {
-            @Override
-            public boolean shouldKeepOnScreen() {
-                // Add logic to determine when to remove the splash screen
-                return false;
-            }
-        });
+        splashScreen.setKeepOnScreenCondition(() -> !isDataLoaded.get());
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+
+        userRef = FirebaseDatabase.getInstance().getReference("Users");
+        userRef.keepSynced(true);
         mAuth = FirebaseAuth.getInstance();
-        // Nếu người dùng login rồi và đã xác thực email thì không yêu cầu họ login lại nữa
-        if (mAuth.getCurrentUser() != null && mAuth.getCurrentUser().isEmailVerified()) {
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
+
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
+        if (currentUser == null || !currentUser.isEmailVerified()) {
+            isDataLoaded.set(true);
         }
-        database = FirebaseDatabase.getInstance().getReference("Users");
+        else {
+            autoLogin(currentUser);
+        }
 
         emailField = findViewById(R.id.login_email);
         passwordField = findViewById(R.id.login_password);
@@ -95,6 +102,37 @@ public class LoginActivity extends AppCompatActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         findViewById(R.id.google_sign_in_button).setOnClickListener(v -> signInWithGoogle());
+    }
+
+    private void autoLogin(FirebaseUser currentUser) {
+        // Kiểm tra xem người dùng có phải là admin hay không
+        userRef.child(currentUser.getUid()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (!task.isSuccessful()) {
+                    Log.e("[MOVIEMATE LOGIN]", "Failed to query user", task.getException());
+                    isDataLoaded.set(true);
+                    return;
+                }
+
+                DataSnapshot snapshot = task.getResult();
+                User user = snapshot.getValue(User.class);
+                if (user == null)
+                    return;
+
+                Intent intent;// Prevent user from going back to login screen
+                if (user.role.equals("admin")) {
+                    intent = new Intent(LoginActivity.this, AdminMainActivity.class);
+                }
+                else {
+                    intent = new Intent(LoginActivity.this, MainActivity.class);
+                    intent.putExtra("user", user);
+                }
+                startActivity(intent);
+                finish();
+                isDataLoaded.set(true);
+            }
+        });
     }
 
     private void showHidePassword() {
@@ -129,15 +167,40 @@ public class LoginActivity extends AppCompatActivity {
 
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
-                        if (user != null && !user.isEmailVerified()) {
+                        if (user == null)
+                            return;
+
+                        if (!user.isEmailVerified()) {
                             CustomDialog.showAlertDialog(LoginActivity.this, R.drawable.ic_error, "Error", "Please verify your email before logging in.", false);
                             return;
                         }
 
-                        Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finish(); // Prevent user from going back to login screen
+                        DatabaseReference userRef = this.userRef.child(user.getUid());
+                        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                User user = snapshot.getValue(User.class);
+                                if (user == null)
+                                    return;
+
+                                if (user.role.equals("admin")) {
+                                    Intent intent = new Intent(LoginActivity.this, AdminMainActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                                else {
+                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                    intent.putExtra("user", user);
+                                    startActivity(intent);
+                                    finish(); // Prevent user from going back to login screen
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                Log.d("[MOVIEMATE LOGIN]", "Failed to query user");
+                            }
+                        });
                     } else {
                         CustomDialog.showAlertDialog(LoginActivity.this, R.drawable.ic_error, "Error", "Login failed: " + task.getException().getMessage(), false);
                     }
@@ -176,13 +239,36 @@ public class LoginActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         // Đăng nhập thành công, lưu thông tin người dùng vào Database nếu chưa tồn tại
                         FirebaseUser user = mAuth.getCurrentUser();
-                        if (user != null) {
-                            checkAndSaveUserToDatabase(user);
-                        }
-                        Toast.makeText(LoginActivity.this, "Google sign-in successful", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finish(); // Đóng LoginActivity sau khi đăng nhập thành công
+                        if (user == null)
+                            return;
+
+                        checkAndSaveUserToDatabase(user);
+                        userRef.child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                User user = snapshot.getValue(User.class);
+                                if (user == null)
+                                    return;
+
+                                if (user.role.equals("admin")) {
+                                    Intent intent = new Intent(LoginActivity.this, AdminMainActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                                else {
+                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                    intent.putExtra("user", user);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                Log.d("[MOVIEMATE LOGIN]", "Failed to query user");
+                            }
+                        });
+
                     } else {
                         // Đăng nhập thất bại
                         CustomDialog.showAlertDialog(LoginActivity.this, R.drawable.ic_error, "Error", "Google sign-in failed.", false);
@@ -192,14 +278,14 @@ public class LoginActivity extends AppCompatActivity {
 
     private void checkAndSaveUserToDatabase(FirebaseUser firebaseUser) {
         String uid = firebaseUser.getUid();
-        DatabaseReference userRef = database.child(uid);
+        DatabaseReference userRef = this.userRef.child(uid);
 
         userRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && !task.getResult().exists()) {
                 // Nếu người dùng chưa tồn tại trong Database, tạo bản ghi mới
                 String email = firebaseUser.getEmail();
                 String name = firebaseUser.getDisplayName();
-                User user = new User(name, null, email, null); // Chỉ lưu name và email
+                User user = new User(name, null, email, null, "user");
 
                 userRef.setValue(user)
                         .addOnSuccessListener(aVoid -> Log.d("LoginActivity", "User saved to database"))

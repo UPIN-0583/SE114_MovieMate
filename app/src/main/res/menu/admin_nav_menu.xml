@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/navAdminMovies"
+        android:title="@string/movies"
+        android:icon="@drawable/ic_movie" />
+    <item
+        android:id="@+id/navAdminUsers"
+        android:title="@string/users"
+        android:icon="@drawable/user" />
+    <item
+        android:id="@+id/navAdminStatistic"
+        android:title="@string/statistic"
+        android:icon="@drawable/ic_statistic" />
+    <item
+        android:id="@+id/navAdminPanel"
+        android:title="@string/admin"
+        android:icon="@drawable/ic_admin_panel" />
+</menu>

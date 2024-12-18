@@ -136,12 +136,14 @@ public class SelectSeatActivity extends AppCompatActivity {
     private void setupBackEvent() {
         backBtn.setOnClickListener(v -> {
             cancelHolding();
+            finish();
         });
 
         getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 cancelHolding();
+                finish();
             }
         });
     }

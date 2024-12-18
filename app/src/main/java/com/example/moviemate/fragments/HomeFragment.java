@@ -105,9 +105,9 @@ public class HomeFragment extends Fragment {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     String userName = snapshot.getValue(String.class);
                     if (userName != null) {
-                        userNameTextView.setText("Hi, " + userName);
+                        userNameTextView.setText(String.format("Hi, %s", userName));
                     } else {
-                        userNameTextView.setText("Hi, User");
+                        userNameTextView.setText(R.string.hi_user);
                     }
                 }
 
@@ -123,9 +123,6 @@ public class HomeFragment extends Fragment {
             public void onClick(View v) {
                 // Tạo Intent để mở SearchActivity
                 Intent intent = new Intent(getActivity(), SearchActivity.class);
-
-                // Truyền danh sách phim vào Intent
-                intent.putExtra("allMovies", new ArrayList<>(allMoviesList));
 
                 // Khởi chạy SearchActivity
                 startActivity(intent);

@@ -29,7 +29,7 @@ public class MovieFragment extends Fragment {
         TabLayout tabLayout = view.findViewById(R.id.tab_layout);
         ViewPager2 viewPager = view.findViewById(R.id.view_pager);
 
-        MoviePagerAdapter moviePagerAdapter = new MoviePagerAdapter(this);
+        MoviePagerAdapter moviePagerAdapter = new MoviePagerAdapter(this, false);
         viewPager.setAdapter(moviePagerAdapter);
 
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {

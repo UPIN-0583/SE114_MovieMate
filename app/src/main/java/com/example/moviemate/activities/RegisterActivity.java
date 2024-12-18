@@ -112,7 +112,9 @@ public class RegisterActivity extends AppCompatActivity {
                         if (firebaseUser != null) {
                             String uid = firebaseUser.getUid();
                             String name = ((EditText) findViewById(R.id.register_name)).getText().toString().trim();
-                            User user = new User(name, null, email, null); // Khởi tạo User với avatarUrl là null
+
+                            String DEFAULT_ROLE = "user";
+                            User user = new User(name, null, email, null, DEFAULT_ROLE); // Khởi tạo User với avatarUrl là null
 
                             database.child(uid).setValue(user)
                                     .addOnSuccessListener(aVoid -> {

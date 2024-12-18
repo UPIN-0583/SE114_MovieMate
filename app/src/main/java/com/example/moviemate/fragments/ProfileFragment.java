@@ -1,13 +1,10 @@
 package com.example.moviemate.fragments;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,6 +15,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.example.moviemate.R;
+import com.example.moviemate.activities.ChangePasswordActivity;
+import com.example.moviemate.activities.LoginActivity;
 import com.example.moviemate.activities.UpdateProfileActivity;
 import com.example.moviemate.models.User;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,15 +26,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ProfileFragment extends Fragment {
 
 
     private TextView nameTextView, phoneTextView, emailTextView;
-    private ImageView avatarImageView;
+    private CircleImageView avatarImageView;
     private DatabaseReference database;
     private FirebaseAuth auth;
 
@@ -67,9 +66,19 @@ public class ProfileFragment extends Fragment {
 
         ConstraintLayout changePasswordLayout = view.findViewById(R.id.changePasswordLayout);
         changePasswordLayout.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Chức năng đang được phát triển", Toast.LENGTH_SHORT).show();
+            changePassword();
+        });
+
+        ConstraintLayout logoutLayout = view.findViewById(R.id.logoutLayout);
+        logoutLayout.setOnClickListener(v -> {
+            logout();
         });
         return view;
+    }
+
+    private void changePassword() {
+        Intent intent = new Intent(getActivity(), ChangePasswordActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -81,15 +90,26 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    private void logout() {
+        auth.signOut();
+        Intent intent = new Intent(getActivity(), LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+
+        if (getActivity() != null) {
+            getActivity().finish();
+        }
+    }
+
     private void loadUserInfo(String uid) {
-        database.child("Users").child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+        database.child("Users").child(uid).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User userInfo = snapshot.getValue(User.class);
                 if (userInfo != null) {
-                    if (userInfo.name == null )  nameTextView.setText("Null");
+                    if (userInfo.name == null )  nameTextView.setText(R.string.not_set_yet);
                     else nameTextView.setText(userInfo.name);
-                    if (userInfo.phone == null) phoneTextView.setText("Null");
+                    if (userInfo.phone == null) phoneTextView.setText(R.string.not_set_yet);
                     else phoneTextView.setText(userInfo.phone);
                     emailTextView.setText(userInfo.email);
 
@@ -98,13 +118,13 @@ public class ProfileFragment extends Fragment {
                         Picasso.get().load(userInfo.avatarUrl).into(avatarImageView);
                     }
                 } else {
-                    Toast.makeText(getActivity(), "Không thể tải thông tin người dùng", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Failed to load user information", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getActivity(), "Lỗi khi tải thông tin", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Failed to load information", Toast.LENGTH_SHORT).show();
             }
         });
     }

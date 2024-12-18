@@ -54,4 +54,27 @@
     <string name="selected">Selected</string>
     <string name="buy_ticket">Buy Ticket</string>
     <string name="complete_in">Complete in</string>
+    <string name="change_password">Change password</string>
+    <string name="enter_your_current_password">Enter your current password</string>
+    <string name="enter_new_password">Enter new password</string>
+    <string name="re_enter_new_password">Re-enter new password</string>
+    <string name="not_set_yet">Not set yet</string>
+    <string name="continueStr">Continue</string>
+    <string name="movie_detail">Movie Detail</string>
+    <string name="time">Time:</string>
+    <string name="language">Language:</string>
+    <string name="rating">Rating:</string>
+    <string name="movie_genre">Movie genre:</string>
+    <string name="storyline">Storyline</string>
+    <string name="director">Director</string>
+    <string name="actor">Actor</string>
+    <string name="cinema">Cinema</string>
+    <string name="hi_user">Hi, User</string>
+    <string name="movies">Movies</string>
+    <string name="users">Users</string>
+    <string name="statistic">Statistic</string>
+    <string name="admin">Admin</string>
+    <string name="home">Home</string>
+    <string name="ticket">Ticket</string>
+    <string name="movie">Movie</string>
 </resources>
