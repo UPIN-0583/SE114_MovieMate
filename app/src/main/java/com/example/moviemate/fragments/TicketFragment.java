@@ -54,7 +54,7 @@ public class TicketFragment extends Fragment {
 
     private void loadUserTickets() {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        userTicketsRef = FirebaseDatabase.getInstance().getReference("Users").child(userId).child("Tickets");
+        userTicketsRef = FirebaseDatabase.getInstance().getReference("Tickets").child(userId);
 
         userTicketsRef.addValueEventListener(new ValueEventListener() {
             @Override
