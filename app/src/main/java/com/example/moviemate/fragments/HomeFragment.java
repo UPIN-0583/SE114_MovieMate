@@ -124,9 +124,6 @@ public class HomeFragment extends Fragment {
                 // Tạo Intent để mở SearchActivity
                 Intent intent = new Intent(getActivity(), SearchActivity.class);
 
-                // Truyền danh sách phim vào Intent
-                intent.putExtra("allMovies", new ArrayList<>(allMoviesList));
-
                 // Khởi chạy SearchActivity
                 startActivity(intent);
             }

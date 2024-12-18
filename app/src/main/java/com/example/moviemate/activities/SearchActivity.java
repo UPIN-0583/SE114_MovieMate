@@ -3,6 +3,8 @@ package com.example.moviemate.activities;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -16,6 +18,11 @@ import android.widget.ImageButton;
 import com.example.moviemate.R;
 import com.example.moviemate.adapters.MovieSearchAdapter;
 import com.example.moviemate.models.Movie;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +42,8 @@ public class SearchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
-        // Nhận danh sách phim từ Intent
-        allMoviesList = (List<Movie>) getIntent().getSerializableExtra("allMovies");
+        allMoviesList = new ArrayList<>();
+        loadMoviesFromDatabase();
 
         // Khởi tạo view
         backBtn = findViewById(R.id.BackBtn);
@@ -90,5 +97,25 @@ public class SearchActivity extends AppCompatActivity {
             }
         }
         searchResultAdapter.notifyDataSetChanged();
+    }
+
+    private void loadMoviesFromDatabase() {
+        DatabaseReference moviesRef = FirebaseDatabase.getInstance().getReference("Movies");
+
+        moviesRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                allMoviesList.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Movie movie = snapshot.getValue(Movie.class);
+                    allMoviesList.add(movie);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle possible errors.
+            }
+        });
     }
 }
