@@ -84,7 +84,8 @@ public class PaymentActivity extends AppCompatActivity {
                     String status = data.getStringExtra("status");
                     if (status == null) return;
                     if (status.equals("cancel")) {
-                        cancelPayment("Thanh toán huỷ bởi người dùng");
+                        cancelPayment();
+                        CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Error", "Payment cancelled", true);
                     } else if (status.equals("success")) {
                         successPayment();
                     }
@@ -155,7 +156,8 @@ public class PaymentActivity extends AppCompatActivity {
                     "Are you sure you want to cancel the payment?",
                     isYes -> {
                         if (isYes) {
-                            cancelPayment("User cancelled payment");
+                            cancelPayment();
+                            this.finish();
                         }
                     });
         });
@@ -169,7 +171,8 @@ public class PaymentActivity extends AppCompatActivity {
                         "Are you sure you want to cancel the payment?",
                         isYes -> {
                             if (isYes) {
-                                cancelPayment("User cancelled payment");
+                                cancelPayment();
+                                PaymentActivity.this.finish();
                             }
                         });
             }
@@ -199,7 +202,10 @@ public class PaymentActivity extends AppCompatActivity {
         }
     }
     private void handlePaymentTimeout() {
-        runOnUiThread(() -> cancelPayment("Payment timeout"));
+        runOnUiThread(() -> {
+            cancelPayment();
+            CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Error", "Payment timeout", true);
+        });
     }
 
     private void initPaymentMethods() {
@@ -250,18 +256,21 @@ public class PaymentActivity extends AppCompatActivity {
                 payBtn.setEnabled(true);
 
                 if (!response.isSuccessful() || response.body() == null) {
-                    cancelPayment("Failed to create payment link (Network error)");
+                    cancelPayment();
+                    CustomDialog.showAlertDialog(PaymentActivity.this, R.drawable.ic_error, "Error", "Failed to create payment link (Network error)", true);
                     return;
                 }
 
                 CreatePayLinkResponse dataResponse = response.body();
 
                 if (dataResponse.getCode().equals(ORDER_ID_EXIST_ERR_CODE)) {
-                    cancelPayment("Failed to create payment link (Order ID already exists)");
+                    cancelPayment();
+                    CustomDialog.showAlertDialog(PaymentActivity.this, R.drawable.ic_error, "Error", "Failed to create payment link (Order ID already exists)", true);
                     return;
                 }
                 else if (!dataResponse.getCode().equals("00")) {
-                    cancelPayment("Failed to create payment link (PayOS API error)");
+                    cancelPayment();
+                    CustomDialog.showAlertDialog(PaymentActivity.this, R.drawable.ic_error, "Error", "Failed to create payment link (PayOS API error)", true);
                     return;
                 }
 
@@ -275,21 +284,21 @@ public class PaymentActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<CreatePayLinkResponse> call, Throwable throwable) {
-                cancelPayment("Failed to create payment link (Network error)");
+                cancelPayment();
+                payBtn.setEnabled(true);
+                CustomDialog.showAlertDialog(PaymentActivity.this, R.drawable.ic_error, "Error", "Failed to create payment link (Network error)", true);
             }
         });
 
     }
 
-    private void cancelPayment(String reason) {
+    private void cancelPayment() {
         if (paymentTimer != null) {
             paymentTimer.cancel();
         }
 
         Intent data = new Intent();
         setResult(RESULT_CANCELED, data);
-
-        CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Notice", "Payment canceled due to: " + reason, true);
     }
 
     private void successPayment() {
