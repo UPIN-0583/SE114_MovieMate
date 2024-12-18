@@ -135,7 +135,7 @@
         android:drawablePadding="16dp"
         android:ems="10"
         android:hint="@string/phone_number"
-        android:inputType="text"
+        android:inputType="phone"
         android:paddingStart="8dp"
         android:paddingTop="24dp"
         android:paddingBottom="24dp"
