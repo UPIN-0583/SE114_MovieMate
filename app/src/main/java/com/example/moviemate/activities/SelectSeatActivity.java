@@ -378,6 +378,15 @@ public class SelectSeatActivity extends AppCompatActivity {
 
     // Huỷ giữ chỗ khi bấm back hoặc hết thời gian
     private void cancelHolding() {
+        timer.cancel();
+
+        Thread thread = new Thread(this::restoreSeatStatus);
+        thread.start();
+    }
+
+    private void restoreSeatStatus() {
+        if (selectedDate == null || selectedTime == null || selectedSeats == null) return;
+
         DatabaseReference seatRef = FirebaseDatabase.getInstance().getReference("Cinemas")
                 .child(cinemaID)
                 .child("Movies")
@@ -393,8 +402,6 @@ public class SelectSeatActivity extends AppCompatActivity {
                         Toast.makeText(this, "Failed to restore seat status", Toast.LENGTH_SHORT).show();
                     });
         }
-
-        timer.cancel();
     }
 
     // Countdown timer
