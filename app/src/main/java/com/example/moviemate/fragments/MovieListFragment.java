@@ -53,7 +53,7 @@ public class MovieListFragment extends Fragment {
         recyclerView.setLayoutManager(gridLayoutManager);
 
         movieList = new ArrayList<>();
-        movieAdapter = new Movie2Adapter(getContext(), movieList);
+        movieAdapter = new Movie2Adapter(getContext(), movieList, false);
         recyclerView.setAdapter(movieAdapter);
 
         if (getArguments() != null) {
