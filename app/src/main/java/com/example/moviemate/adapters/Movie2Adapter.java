@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.moviemate.R;
+import com.example.moviemate.activities.AdminMovieDetailActivity;
 import com.example.moviemate.activities.MovieDetailActivity;
 import com.example.moviemate.models.Movie;
 import com.squareup.picasso.Picasso;
@@ -21,11 +22,13 @@ import java.util.List;
 public class Movie2Adapter extends RecyclerView.Adapter<Movie2Adapter.MovieViewHolder> {
 
     private Context context;
+    private boolean isAdmin;
     private List<Movie> movieList;
 
-    public Movie2Adapter(Context context, List<Movie> movieList) {
+    public Movie2Adapter(Context context, List<Movie> movieList, boolean isAdmin) {
         this.context = context;
         this.movieList = movieList;
+        this.isAdmin = isAdmin;
     }
 
     @NonNull
@@ -52,7 +55,14 @@ public class Movie2Adapter extends RecyclerView.Adapter<Movie2Adapter.MovieViewH
 
         // Thiết lập sự kiện nhấp vào item
         holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(context, MovieDetailActivity.class);
+            Intent intent;
+
+            if (isAdmin) {
+                intent = new Intent(context, AdminMovieDetailActivity.class);
+            }
+            else {
+                intent = new Intent(context, MovieDetailActivity.class);
+            }
 
             // Truyền movie qua Intent
             intent.putExtra("movie", movie);
