@@ -77,4 +77,11 @@
     <string name="home">Home</string>
     <string name="ticket">Ticket</string>
     <string name="movie">Movie</string>
+
+    <string-array name="statistic_types">
+        <item>Weekly Statistics</item>
+        <item>Monthly Statistics</item>
+        <item>Yearly Statistics</item>
+    </string-array>
+
 </resources>
