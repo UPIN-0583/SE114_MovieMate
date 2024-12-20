@@ -2,6 +2,7 @@ package com.example.moviemate.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
@@ -16,6 +17,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.cloudinary.android.MediaManager;
+import com.cloudinary.android.callback.ErrorInfo;
+import com.cloudinary.android.callback.UploadCallback;
 import com.example.moviemate.R;
 import com.example.moviemate.adapters.DayAdapter;
 import com.example.moviemate.adapters.TimeAdapter;
@@ -46,6 +50,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import io.github.cdimascio.dotenv.Dotenv;
 
 public class SelectSeatActivity extends AppCompatActivity {
     private int totalTimeLeft = 1200000; // Tổng thời gian đặt ghế, thanh toán là 20 phút
@@ -359,21 +365,47 @@ public class SelectSeatActivity extends AppCompatActivity {
 
     // Hàm tải mã vạch lên Firebase Storage và lưu URL vào Database
     private void uploadBarcodeToFirebase(Bitmap barcodeBitmap, String ticketId, Map<String, Object> ticketData) {
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageRef = storage.getReference().child("barcodes/" + ticketId + ".png");
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         barcodeBitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
         byte[] data = baos.toByteArray();
 
-        UploadTask uploadTask = storageRef.putBytes(data);
-        uploadTask.addOnSuccessListener(taskSnapshot -> storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-            // Update barcode
-            userTicketsRef.child(ticketId).child("BarcodeImage").setValue(uri.toString())
-                    .addOnFailureListener(e -> Toast.makeText(this, "Failed to save bar code", Toast.LENGTH_SHORT).show());
-        })).addOnFailureListener(e -> {
-            Toast.makeText(this, "Failed to load bar code", Toast.LENGTH_SHORT).show();
-        });
+        MediaManager.get().upload(data)
+                .option("folder", "barcodes")
+                .option("public_id", ticketId)
+                .option("resource_type", "image")
+                .callback(new UploadCallback() {
+                    @Override
+                    public void onStart(String requestId) {
+
+                    }
+
+                    @Override
+                    public void onProgress(String requestId, long bytes, long totalBytes) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(String requestId, Map resultData) {
+                        Dotenv dotenv = Dotenv.configure().directory("/assets").filename("env").load();
+
+                        String cloudinaryCloudName = dotenv.get("CLOUDINARY_CLOUD_NAME");
+                        String barcodeUrl = "https://res.cloudinary.com/" + cloudinaryCloudName + "/image/upload/q_auto/f_auto/" + resultData.get("public_id");
+
+                        userTicketsRef.child(ticketId).child("BarcodeImage").setValue(barcodeUrl)
+                                .addOnFailureListener(e -> Log.e("UploadBarcode", "Failed to save bar code"));
+                    }
+
+                    @Override
+                    public void onError(String requestId, ErrorInfo error) {
+                        Log.e("UploadBarcode", "Failed to upload bar code: " + error.getDescription());
+                    }
+
+                    @Override
+                    public void onReschedule(String requestId, ErrorInfo error) {
+
+                    }
+                })
+                .dispatch();
     }
 
     // Huỷ giữ chỗ khi bấm back hoặc hết thời gian
