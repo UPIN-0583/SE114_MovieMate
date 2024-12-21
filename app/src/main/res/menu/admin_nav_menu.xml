@@ -5,6 +5,10 @@
         android:title="@string/movies"
         android:icon="@drawable/ic_movie" />
     <item
+        android:id="@+id/navAdminTickets"
+        android:title="@string/tickets"
+        android:icon="@drawable/ic_ticket" />
+    <item
         android:id="@+id/navAdminUsers"
         android:title="@string/users"
         android:icon="@drawable/user" />
