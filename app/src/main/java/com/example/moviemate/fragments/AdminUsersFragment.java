@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.example.moviemate.R;
 import com.example.moviemate.adapters.UserAdapter;
@@ -29,7 +30,6 @@ import java.util.List;
 public class AdminUsersFragment extends Fragment {
     private List<User> users;
     private UserAdapter adapter;
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -59,11 +59,29 @@ public class AdminUsersFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 users.clear();
+                int activeUsers = 0;
                 for (DataSnapshot userSnapshot : snapshot.getChildren()) {
                     User user = userSnapshot.getValue(User.class);
+                    if (user == null)
+                        continue;
+
                     users.add(user);
-                    adapter.notifyItemChanged(users.size() - 1);
+
+                    if (!user.isBanned)
+                        activeUsers++;
                 }
+
+                View v = getView();
+                if (v != null) {
+                    TextView totalUsersTextView = v.findViewById(R.id.totalUserTextView);
+                    totalUsersTextView.setText(String.valueOf(users.size()));
+                    TextView activeUsersTextView = v.findViewById(R.id.totalActiveUserTextView);
+                    activeUsersTextView.setText(String.valueOf(activeUsers));
+                    TextView bannedUsersTextView = v.findViewById(R.id.totalBannedUserTextView);
+                    bannedUsersTextView.setText(String.valueOf(users.size() - activeUsers));
+                }
+
+                adapter.notifyDataSetChanged();
             }
 
             @Override

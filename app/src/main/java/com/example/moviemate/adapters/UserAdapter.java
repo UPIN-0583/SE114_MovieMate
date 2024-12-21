@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.moviemate.R;
 import com.example.moviemate.models.User;
+import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -55,6 +57,24 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         if (user.role.equals("user")) {
             holder.adminIndicator.setVisibility(View.GONE);
         }
+        else {
+            holder.adminIndicator.setVisibility(View.VISIBLE);
+        }
+
+        if (user.isBanned) {
+            holder.bannedIndicator.setVisibility(View.VISIBLE);
+            holder.activeIndicator.setVisibility(View.GONE);
+            holder.banUnbanButton.setImageResource(R.drawable.ic_unban);
+        } else {
+            holder.bannedIndicator.setVisibility(View.GONE);
+            holder.activeIndicator.setVisibility(View.VISIBLE);
+            holder.banUnbanButton.setImageResource(R.drawable.ic_ban);
+        }
+
+        holder.banUnbanButton.setOnClickListener(v -> {
+            // Đảo ngược trạng thái banned của user
+            FirebaseDatabase.getInstance().getReference("Users").child(user.id).child("isBanned").setValue(!user.isBanned);
+        });
     }
 
     @Override
@@ -68,7 +88,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         private final TextView name;
         private final TextView email;
         private final TextView phone;
-
+        private TextView activeIndicator;
+        private TextView bannedIndicator;
+        private ImageButton banUnbanButton;
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -77,6 +99,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             name = itemView.findViewById(R.id.nameTextView);
             email = itemView.findViewById(R.id.emailTextView);
             phone = itemView.findViewById(R.id.phoneTextView);
+            activeIndicator = itemView.findViewById(R.id.activeStateTextView);
+            bannedIndicator = itemView.findViewById(R.id.bannedStateTextView);
+            banUnbanButton = itemView.findViewById(R.id.banUnbanImgBtn);
         }
     }
 }

@@ -64,6 +64,7 @@
             android:text="Phone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/emailTextView" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ImageView
@@ -74,4 +75,40 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_admin" />
+
+    <TextView
+        android:id="@+id/activeStateTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/border"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:text="@string/active"
+        android:textColor="@color/light_green"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/bannedStateTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/banned_border"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:text="@string/banned"
+        android:textColor="@color/red"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/activeStateTextView" />
+
+    <ImageButton
+        android:id="@+id/banUnbanImgBtn"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/back_button_effect"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/ic_ban" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
