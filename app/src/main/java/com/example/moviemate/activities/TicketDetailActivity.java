@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.moviemate.R;
 import com.example.moviemate.models.Ticket;
+import com.example.moviemate.utils.MoneyFormatter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -60,29 +61,30 @@ public class TicketDetailActivity extends AppCompatActivity {
     }
 
     private void loadTicketDetails(String ticketID) {
-        // Tham chiếu đến vé dựa trên ticketID của người dùng hiện tại
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        userTicketsRef = FirebaseDatabase.getInstance().getReference("Users").child(userId).child("Tickets").child(ticketID);
+        userTicketsRef = FirebaseDatabase.getInstance().getReference("Tickets").child(userId).child(ticketID);
 
         userTicketsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Ticket ticket = snapshot.getValue(Ticket.class);
                 if (ticket != null) {
-
                     // Hiển thị các thông tin chính từ ticket
                     showTime.setText(ticket.getTime() + "\n" + ticket.getDate());
 
                     // Xử lý ghế ngồi dưới dạng danh sách
                     List<String> seats = ticket.getSeats();
                     if (seats != null && !seats.isEmpty()) {
-                        seatInfo.setText("Seats: " + String.join(", ", seats));
-                    } else {
+                        String seatsString = "Seats: " + String.join(", ", ticket.getSeats());
+                        seatInfo.setText(seatsString);
+                    }
+                    else {
                         seatInfo.setText("Seats: N/A");
                     }
 
-                    price.setText(ticket.getTotalPrice() + " VND");
-                    orderId.setText("Ticket ID: " + ticket.getTicketID());
+                    String priceFormatted = MoneyFormatter.formatMoney(TicketDetailActivity.this, ticket.getTotalPrice());
+                    price.setText(String.format("%s VND", priceFormatted));
+                    orderId.setText(String.format("Ticket ID: %s", ticket.getTicketID()));
 
                     // Tải thông tin bổ sung từ rạp và phim
                     loadCinemaDetails(ticket.getCinema());
