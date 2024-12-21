@@ -114,7 +114,7 @@ public class RegisterActivity extends AppCompatActivity {
                             String name = ((EditText) findViewById(R.id.register_name)).getText().toString().trim();
 
                             String DEFAULT_ROLE = "user";
-                            User user = new User(uid, name, null, email, null, DEFAULT_ROLE); // Khởi tạo User với avatarUrl là null
+                            User user = new User(uid, name, null, email, null, DEFAULT_ROLE, false); // Khởi tạo User với avatarUrl là null
 
                             database.child(uid).setValue(user)
                                     .addOnSuccessListener(aVoid -> {

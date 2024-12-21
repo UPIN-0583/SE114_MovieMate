@@ -26,7 +26,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.Firebase;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -103,7 +102,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void autoLogin(FirebaseUser currentUser) {
-        // Kiểm tra xem người dùng có phải là admin hay không
         userRef.child(currentUser.getUid()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
@@ -117,6 +115,12 @@ public class LoginActivity extends AppCompatActivity {
                 User user = snapshot.getValue(User.class);
                 if (user == null)
                     return;
+
+                if (user.isBanned) {
+                    isDataLoaded.set(true);
+                    CustomDialog.showAlertDialog(LoginActivity.this, R.drawable.ic_error, "Notice", "Your account has been banned. Contact admin for help.", false);
+                    return;
+                }
 
                 Intent intent;// Prevent user from going back to login screen
                 if (user.role.equals("admin")) {
@@ -283,7 +287,7 @@ public class LoginActivity extends AppCompatActivity {
                 // Nếu người dùng chưa tồn tại trong Database, tạo bản ghi mới
                 String email = firebaseUser.getEmail();
                 String name = firebaseUser.getDisplayName();
-                User user = new User(uid, name, null, email, null, "user");
+                User user = new User(uid, name, null, email, null, "user", false);
 
                 userRef.setValue(user)
                         .addOnSuccessListener(aVoid -> Log.d("LoginActivity", "User saved to database"))
