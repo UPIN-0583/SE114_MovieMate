@@ -1,5 +1,6 @@
 package com.example.moviemate.activities;
 
+import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
@@ -15,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.splashscreen.SplashScreen;
 
 
+import com.example.moviemate.MovieMateApp;
 import com.example.moviemate.R;
 
 import com.example.moviemate.models.User;
@@ -133,6 +135,9 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
                 isDataLoaded.set(true);
+
+                MovieMateApp app = (MovieMateApp) getApplication();
+                app.startTracking(currentUser.getUid());
             }
         });
     }
@@ -196,6 +201,9 @@ public class LoginActivity extends AppCompatActivity {
                                     startActivity(intent);
                                     finish(); // Prevent user from going back to login screen
                                 }
+
+                                MovieMateApp app = (MovieMateApp) getApplication();
+                                app.startTracking(user.id);
                             }
 
                             @Override
@@ -263,6 +271,9 @@ public class LoginActivity extends AppCompatActivity {
                                     startActivity(intent);
                                     finish();
                                 }
+
+                                MovieMateApp app = (MovieMateApp) getApplication();
+                                app.startTracking(user.id);
                             }
 
                             @Override
