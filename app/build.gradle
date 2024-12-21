@@ -58,4 +58,5 @@ dependencies {
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.cloudinary:cloudinary-android:3.0.2'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+    implementation 'com.google.android.material:material:1.11.0'
 }
