@@ -77,6 +77,13 @@
     <string name="home">Home</string>
     <string name="ticket">Ticket</string>
     <string name="movie">Movie</string>
+
+    <string-array name="statistic_types">
+        <item>Weekly Statistics</item>
+        <item>Monthly Statistics</item>
+        <item>Yearly Statistics</item>
+    </string-array>
+
     <string name="total_users">Total Users</string>
     <string name="active_users">Active Users</string>
     <string name="banned_users">Banned Users</string>
