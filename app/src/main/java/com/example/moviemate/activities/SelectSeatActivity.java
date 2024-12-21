@@ -55,13 +55,10 @@ public class SelectSeatActivity extends AppCompatActivity {
     private GridLayout seatGridLayout;
     private TextView totalPriceTextView;
     private TextView timeLeftTextView;
-    private Button buyTicketButton;
 
-    private DayAdapter dayAdapter;
-    private TimeAdapter timeAdapter;
-    private List<String> dateList = new ArrayList<>();
-    private List<String> timeList = new ArrayList<>();
-    private List<String> selectedSeats = new ArrayList<>(); // Danh sách ghế đã chọn
+    private final List<String> dateList = new ArrayList<>();
+    private final List<String> timeList = new ArrayList<>();
+    private final List<String> selectedSeats = new ArrayList<>(); // Danh sách ghế đã chọn
 
     private String selectedDate;
     private String selectedTime;
@@ -95,13 +92,13 @@ public class SelectSeatActivity extends AppCompatActivity {
         seatGridLayout = findViewById(R.id.seat_grid_layout);
         totalPriceTextView = findViewById(R.id.total_price);
         timeLeftTextView = findViewById(R.id.time_left);
-        buyTicketButton = findViewById(R.id.buy_ticket_button);
+        Button buyTicketButton = findViewById(R.id.buy_ticket_button);
 
         dateRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         timeRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
-        userTicketsRef = FirebaseDatabase.getInstance().getReference("Users")
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Tickets");
+        userTicketsRef = FirebaseDatabase.getInstance().getReference("Tickets")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
         fetchShowTimesFromFirebase();
 
@@ -192,7 +189,7 @@ public class SelectSeatActivity extends AppCompatActivity {
     }
 
     private void setupDateAdapter() {
-        dayAdapter = new DayAdapter(this, dateList, date -> {
+        DayAdapter dayAdapter = new DayAdapter(this, dateList, date -> {
             selectedDate = date;
             fetchTimesForSelectedDate(date);
         });
@@ -222,7 +219,7 @@ public class SelectSeatActivity extends AppCompatActivity {
     }
 
     private void setupTimeAdapter() {
-        timeAdapter = new TimeAdapter(this, timeList, time -> {
+        TimeAdapter timeAdapter = new TimeAdapter(this, timeList, time -> {
             selectedTime = time;
             fetchSeatsForSelectedTime(selectedDate, time);
         });
@@ -335,6 +332,11 @@ public class SelectSeatActivity extends AppCompatActivity {
         ticketData.put("seats", selectedSeats);
         ticketData.put("totalPrice", totalPrice);
         ticketData.put("TicketID", ticketId);  // Lưu TicketID
+        ticketData.put("BarcodeImage", ""); // URL của mã vạch sẽ được cập nhật sau khi tải lên Firebase Storage
+
+        // Lưu vé
+        userTicketsRef.child(ticketId).setValue(ticketData)
+                .addOnFailureListener(e -> Toast.makeText(this, "Failed to save ticket. Please contact support", Toast.LENGTH_SHORT).show());
 
         Bitmap barcodeBitmap = createBarcode(ticketId);  // Tạo mã vạch từ TicketID
         if (barcodeBitmap != null) {
@@ -366,35 +368,12 @@ public class SelectSeatActivity extends AppCompatActivity {
 
         UploadTask uploadTask = storageRef.putBytes(data);
         uploadTask.addOnSuccessListener(taskSnapshot -> storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-            ticketData.put("BarcodeImage", uri.toString());  // Lưu URL mã vạch vào dữ liệu vé
-
-            // Lưu dữ liệu vé vào Firebase Realtime Database
-            userTicketsRef.child(ticketId).setValue(ticketData)
-                    .addOnSuccessListener(aVoid -> {
-                        updateSeatStatus();
-                    })
-                    .addOnFailureListener(e -> Toast.makeText(this, "Failed to save ticket. Please contact support", Toast.LENGTH_SHORT).show());
+            // Update barcode
+            userTicketsRef.child(ticketId).child("BarcodeImage").setValue(uri.toString())
+                    .addOnFailureListener(e -> Toast.makeText(this, "Failed to save bar code", Toast.LENGTH_SHORT).show());
         })).addOnFailureListener(e -> {
             Toast.makeText(this, "Failed to load bar code", Toast.LENGTH_SHORT).show();
         });
-    }
-
-    private void updateSeatStatus() {
-        DatabaseReference seatsRef = FirebaseDatabase.getInstance().getReference("Cinemas")
-                .child(cinemaID)
-                .child("Movies")
-                .child("Movie" + movie.getMovieID())
-                .child("ShowTimes")
-                .child(selectedDate)
-                .child(selectedTime)
-                .child("Seats");
-
-        for (String seat : selectedSeats) {
-            seatsRef.child(seat).setValue("booked")
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Failed to update seat status", Toast.LENGTH_SHORT).show();
-                    });
-        }
     }
 
     // Huỷ giữ chỗ khi bấm back hoặc hết thời gian

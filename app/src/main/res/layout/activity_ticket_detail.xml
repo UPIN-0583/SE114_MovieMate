@@ -88,7 +88,7 @@
                             android:text="Avengers: Infinity War"
                             android:textSize="20sp"
                             android:textStyle="bold"
-                            android:textColor="@android:color/white" />
+                            android:textColor="@color/yellow" />
 
                         <TextView
                             android:id="@+id/detail_movie_duration"
@@ -136,6 +136,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Section 4\nSeat H7, H8"
+                        android:singleLine="false"
                         android:textColor="@android:color/white"
                         android:gravity="center"
                         android:drawableLeft="@drawable/ic_seat"
