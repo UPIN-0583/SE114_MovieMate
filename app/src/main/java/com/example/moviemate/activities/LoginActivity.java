@@ -283,7 +283,7 @@ public class LoginActivity extends AppCompatActivity {
                 // Nếu người dùng chưa tồn tại trong Database, tạo bản ghi mới
                 String email = firebaseUser.getEmail();
                 String name = firebaseUser.getDisplayName();
-                User user = new User(name, null, email, null, "user");
+                User user = new User(uid, name, null, email, null, "user");
 
                 userRef.setValue(user)
                         .addOnSuccessListener(aVoid -> Log.d("LoginActivity", "User saved to database"))
