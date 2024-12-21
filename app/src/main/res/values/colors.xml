@@ -23,6 +23,8 @@
     <color name="dark_yellow">#261D08</color>
     <color name="dark_gray">#1c1c1c</color>
     <color name="soft_dark_gray">#595959</color>
+    <color name="light_green">#3fda77</color>
+    <color name="red">#ff2929</color>
 
 
     <color name="text_hint">#99FFFFFF</color>

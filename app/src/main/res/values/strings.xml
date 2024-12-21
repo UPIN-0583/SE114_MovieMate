@@ -77,4 +77,9 @@
     <string name="home">Home</string>
     <string name="ticket">Ticket</string>
     <string name="movie">Movie</string>
+    <string name="total_users">Total Users</string>
+    <string name="active_users">Active Users</string>
+    <string name="banned_users">Banned Users</string>
+    <string name="banned">Banned</string>
+    <string name="active">Active</string>
 </resources>
