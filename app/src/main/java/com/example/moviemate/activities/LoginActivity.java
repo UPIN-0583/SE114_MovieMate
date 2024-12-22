@@ -273,7 +273,7 @@ public class LoginActivity extends AppCompatActivity {
                             return;
 
                         checkAndSaveUserToDatabase(user);
-                        userRef.child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        userRef.child(user.getUid()).addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 User user = snapshot.getValue(User.class);
