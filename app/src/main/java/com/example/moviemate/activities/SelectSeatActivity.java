@@ -198,7 +198,15 @@ public class SelectSeatActivity extends AppCompatActivity {
     }
 
     private void setupDateAdapter() {
-        DayAdapter dayAdapter = new DayAdapter(this, dateList, date -> {
+        DayAdapter dayAdapter = new DayAdapter(this, dateList, selectedDate, date -> {
+            if (selectedDate != null && selectedDate.equals(date)) return; // Không cần fetch lại nếu chọn ngày cũ
+
+            restoreSeatStatus(); // Huỷ giữ chỗ ghế khi chọn ngày mới
+            selectedTime = null; // Reset giờ đã chọn
+            seatGridLayout.removeAllViews(); // Xóa danh sách ghế cũ
+            totalPrice = 0; // Reset tổng giá vé
+            totalPriceTextView.setText(String.format(Locale.getDefault(), "Total: %s VND", MoneyFormatter.formatMoney(this, totalPrice)));
+
             selectedDate = date;
             fetchTimesForSelectedDate(date);
         });
@@ -228,7 +236,10 @@ public class SelectSeatActivity extends AppCompatActivity {
     }
 
     private void setupTimeAdapter() {
-        TimeAdapter timeAdapter = new TimeAdapter(this, timeList, time -> {
+        TimeAdapter timeAdapter = new TimeAdapter(this, timeList, selectedTime, time -> {
+            if (selectedTime != null && selectedTime.equals(time)) return; // Không cần fetch lại nếu chọn giờ cũ
+
+            restoreSeatStatus(); // Huỷ giữ chỗ ghế khi chọn giờ mới
             selectedTime = time;
             fetchSeatsForSelectedTime(selectedDate, time);
         });
@@ -236,6 +247,8 @@ public class SelectSeatActivity extends AppCompatActivity {
     }
 
     private void fetchSeatsForSelectedTime(String date, String time) {
+        if (date == null || time == null) return;
+
         cinemaRef.child(date).child(time).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -258,6 +271,8 @@ public class SelectSeatActivity extends AppCompatActivity {
     }
 
     private void setupSeatGrid() {
+        if (selectedDate == null || selectedTime == null) return; // Không hiển thị ghế nếu chưa chọn ngày và giờ
+
         if (seatMap != null && !seatMap.isEmpty()) {
             seatGridLayout.removeAllViews();
             for (Map.Entry<String, String> entry : seatMap.entrySet()) {
@@ -432,6 +447,8 @@ public class SelectSeatActivity extends AppCompatActivity {
                         Toast.makeText(this, "Failed to restore seat status", Toast.LENGTH_SHORT).show();
                     });
         }
+
+        selectedSeats.clear();
     }
 
     // Countdown timer

@@ -24,9 +24,11 @@ public class TimeAdapter extends RecyclerView.Adapter<TimeAdapter.TimeViewHolder
         void onTimeSelected(String time);
     }
 
-    public TimeAdapter(Context context, List<String> timeList, OnTimeSelectedListener listener) {
+    public TimeAdapter(Context context, List<String> timeList, String selectedTime, OnTimeSelectedListener listener) {
         this.context = context;
         this.timeList = timeList;
+        if (selectedTime != null)
+            this.selectedPosition = timeList.indexOf(selectedTime);
         this.listener = listener;
     }
 

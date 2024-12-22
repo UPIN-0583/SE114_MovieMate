@@ -28,9 +28,11 @@ public class DayAdapter extends RecyclerView.Adapter<DayAdapter.DayViewHolder> {
         void onDaySelected(String day);
     }
 
-    public DayAdapter(Context context, List<String> dayList, OnDaySelectedListener listener) {
+    public DayAdapter(Context context, List<String> dayList, String selectedDay, OnDaySelectedListener listener) {
         this.context = context;
         this.dayList = dayList;
+        if (selectedDay != null)
+            this.selectedPosition = dayList.indexOf(selectedDay);
         this.listener = listener;
     }
 
