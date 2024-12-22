@@ -18,6 +18,8 @@ import android.widget.TextView;
 import com.example.moviemate.R;
 import com.example.moviemate.adapters.UserAdapter;
 import com.example.moviemate.models.User;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,6 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class AdminUsersFragment extends Fragment {
     private List<User> users;
@@ -65,6 +68,11 @@ public class AdminUsersFragment extends Fragment {
                     if (user == null)
                         continue;
 
+                    if (user.id.equals(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())) {
+                        activeUsers++;
+                        continue;
+                    }
+
                     users.add(user);
 
                     if (!user.isBanned)
@@ -74,11 +82,11 @@ public class AdminUsersFragment extends Fragment {
                 View v = getView();
                 if (v != null) {
                     TextView totalUsersTextView = v.findViewById(R.id.totalUserTextView);
-                    totalUsersTextView.setText(String.valueOf(users.size()));
+                    totalUsersTextView.setText(String.valueOf(users.size() + 1));
                     TextView activeUsersTextView = v.findViewById(R.id.totalActiveUserTextView);
                     activeUsersTextView.setText(String.valueOf(activeUsers));
                     TextView bannedUsersTextView = v.findViewById(R.id.totalBannedUserTextView);
-                    bannedUsersTextView.setText(String.valueOf(users.size() - activeUsers));
+                    bannedUsersTextView.setText(String.valueOf(users.size() + 1 - activeUsers));
                 }
 
                 adapter.notifyDataSetChanged();
