@@ -150,7 +150,7 @@
                 android:layout_marginStart="5dp"
                 android:layout_weight="1"
                 android:maxLength="4"
-                android:inputType="text" />
+                android:inputType="number" />
         </LinearLayout>
         <LinearLayout
             android:id="@+id/linearlayout312"
