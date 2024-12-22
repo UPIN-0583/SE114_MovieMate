@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -104,6 +105,22 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void autoLogin(FirebaseUser currentUser) {
+        // Check if user is valid
+        userRef.child(currentUser.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    isDataLoaded.set(true);
+                    return;
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
         userRef.child(currentUser.getUid()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
@@ -219,6 +236,8 @@ public class LoginActivity extends AppCompatActivity {
 
     // Hàm để khởi động quá trình đăng nhập Google
     private void signInWithGoogle() {
+        findViewById(R.id.google_sign_in_button).setEnabled(false);
+        Toast.makeText(LoginActivity.this, "Signing in with Google...", Toast.LENGTH_SHORT).show();
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
@@ -263,12 +282,14 @@ public class LoginActivity extends AppCompatActivity {
                                 if (user.role.equals("admin")) {
                                     Intent intent = new Intent(LoginActivity.this, AdminMainActivity.class);
                                     startActivity(intent);
+                                    findViewById(R.id.google_sign_in_button).setEnabled(true);
                                     finish();
                                 }
                                 else {
                                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                     intent.putExtra("user", user);
                                     startActivity(intent);
+                                    findViewById(R.id.google_sign_in_button).setEnabled(true);
                                     finish();
                                 }
 
