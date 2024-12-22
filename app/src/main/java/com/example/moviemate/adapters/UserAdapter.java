@@ -1,5 +1,6 @@
 package com.example.moviemate.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,6 +40,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         return new UserViewHolder(view);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
         User user = users.get(position);
@@ -49,7 +51,12 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         }
 
         holder.email.setText(user.email);
-        holder.phone.setText(user.phone);
+
+        if (user.phone == null || user.phone.isEmpty()) {
+            holder.phone.setText("Not set yet");
+        } else {
+            holder.phone.setText(user.phone);
+        }
 
         if (user.avatarUrl != null)
             Picasso.get().load(user.avatarUrl).into(holder.avatar);
