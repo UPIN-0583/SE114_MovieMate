@@ -108,6 +108,13 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
                 Toast.makeText(AdminMovieDetailActivity.this, "Please select a cinema first", Toast.LENGTH_SHORT).show();
             }
         });
+
+        TextView editMovie = findViewById(R.id.editMovieTextView);
+        editMovie.setOnClickListener(v -> {
+            Intent editMovieIntent = new Intent(AdminMovieDetailActivity.this, EditMovieActivity.class);
+            editMovieIntent.putExtra("movie", movie);
+            startActivity(editMovieIntent);
+        });
     }
 
     // Hiển thị chi tiết phim
@@ -124,7 +131,7 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
         List<Person> directors = movie.getDirector();
         if (directors != null && !directors.isEmpty()) {
             directorRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-            PersonAdapter directorAdapter = new PersonAdapter(this, directors);
+            PersonAdapter directorAdapter = new PersonAdapter(this, directors, false);
             directorRecyclerView.setAdapter(directorAdapter);
             directorRecyclerView.setVisibility(View.VISIBLE);
         }
@@ -132,7 +139,7 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
         List<Person> actors = movie.getActor();
         if (actors != null && !actors.isEmpty()) {
             actorRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-            PersonAdapter actorAdapter = new PersonAdapter(this, actors);
+            PersonAdapter actorAdapter = new PersonAdapter(this, actors, false);
             actorRecyclerView.setAdapter(actorAdapter);
             actorRecyclerView.setVisibility(View.VISIBLE);
         }
