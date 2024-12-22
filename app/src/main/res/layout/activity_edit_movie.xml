@@ -77,7 +77,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Title" />
+                android:text="@string/title"
+                android:textColor="@color/yellow"
+                android:textStyle="bold"/>
             <EditText
                 android:id="@+id/titleEditText"
                 android:layout_width="match_parent"
@@ -99,7 +101,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/time" />
+                android:text="@string/time"
+                android:textColor="@color/yellow"
+                android:textStyle="bold"/>
 
             <EditText
                 android:id="@+id/timeHourEditText"
@@ -135,7 +139,9 @@
                 android:id="@+id/textView20"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/year" />
+                android:text="@string/year"
+                android:textColor="@color/yellow"
+                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/yearEditText"
@@ -144,7 +150,7 @@
                 android:layout_marginStart="5dp"
                 android:layout_weight="1"
                 android:maxLength="4"
-                android:inputType="text"/>
+                android:inputType="text" />
         </LinearLayout>
         <LinearLayout
             android:id="@+id/linearlayout312"
@@ -159,8 +165,11 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/price" />
+                android:text="@string/price"
+                android:textStyle="bold"
+                android:textColor="@color/yellow"/>
             <EditText
+                android:id="@+id/priceEditText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -175,7 +184,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/status" />
+                android:text="@string/status"
+                android:textColor="@color/yellow"
+                android:textStyle="bold"/>
 
             <Spinner
                 android:id="@+id/statusSpinner"
@@ -203,7 +214,9 @@
                 android:id="@+id/textView14"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/language" />
+                android:text="@string/language"
+                android:textColor="@color/yellow"
+                android:textStyle="bold"/>
 
             <EditText
                 android:id="@+id/languageEditText"
@@ -228,7 +241,9 @@
                 android:id="@+id/textView16"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/rating" />
+                android:text="@string/rating"
+                android:textStyle="bold"
+                android:textColor="@color/yellow"/>
 
             <EditText
                 android:id="@+id/ratingEditText"
@@ -252,7 +267,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/genre" />
+                android:text="@string/genre"
+                android:textColor="@color/yellow"
+                android:textStyle="bold"/>
 
             <EditText
                 android:id="@+id/genreTextEdit"
@@ -277,7 +294,9 @@
                 android:id="@+id/textView18"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/trailer_url" />
+                android:text="@string/trailer_url"
+                android:textColor="@color/yellow"
+                android:textStyle="bold"/>
 
             <EditText
                 android:id="@+id/trailerUrlTextEdit"
@@ -293,6 +312,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="@string/storyline"
+            android:textStyle="bold"
+            android:textColor="@color/yellow"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/linearLayout5" />
 
@@ -314,6 +335,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="@string/director"
+            android:textColor="@color/yellow"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/storylineTextEdit" />
 
@@ -323,6 +346,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:text="@string/add"
+            android:textStyle="bold"
             android:textColor="@color/yellow"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/directorRecylerView" />
@@ -341,6 +365,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="@string/actor"
+            android:textStyle="bold"
+            android:textColor="@color/yellow"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/directorRecylerView" />
 
@@ -372,6 +398,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:text="@string/add"
+            android:textStyle="bold"
             android:textColor="@color/yellow"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/storylineTextEdit" />
@@ -381,7 +408,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="@string/show_time"
+            android:text="@string/show_time_duplicate_datetime_will_be_ignored"
+            android:textStyle="bold"
+            android:textColor="@color/yellow"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/actorRecyclerView" />
 
@@ -391,6 +420,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:text="@string/add"
+            android:textStyle="bold"
             android:textColor="@color/yellow"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/actorRecyclerView" />
