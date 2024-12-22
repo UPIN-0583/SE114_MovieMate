@@ -174,8 +174,11 @@ public class EditMovieActivity extends AppCompatActivity {
 
     private void update() {
         saveButton.setEnabled(false);
+        if (!checkData()) {
+            saveButton.setEnabled(true);
+            return;
+        }
         Toast.makeText(this, "Updating movie...", Toast.LENGTH_SHORT).show();
-        if (!checkData()) return;
         uploadMoviePoster();
         updateShowTime();
         saveButton.setEnabled(true);
