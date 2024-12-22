@@ -114,7 +114,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         List<Person> directors = movie.getDirector();
         if (directors != null && !directors.isEmpty()) {
             directorRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-            PersonAdapter directorAdapter = new PersonAdapter(this, directors);
+            PersonAdapter directorAdapter = new PersonAdapter(this, directors, false);
             directorRecyclerView.setAdapter(directorAdapter);
             directorRecyclerView.setVisibility(View.VISIBLE);
         }
@@ -122,7 +122,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         List<Person> actors = movie.getActor();
         if (actors != null && !actors.isEmpty()) {
             actorRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-            PersonAdapter actorAdapter = new PersonAdapter(this, actors);
+            PersonAdapter actorAdapter = new PersonAdapter(this, actors, false);
             actorRecyclerView.setAdapter(actorAdapter);
             actorRecyclerView.setVisibility(View.VISIBLE);
         }

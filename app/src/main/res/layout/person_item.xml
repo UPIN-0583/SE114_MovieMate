@@ -7,34 +7,54 @@
     app:cardCornerRadius="16dp"
     android:backgroundTint="@color/black">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:padding="8dp"
         android:gravity="center"
         android:background="@color/black">
 
         <!-- Hình ảnh đạo diễn/diễn viên -->
-        <ImageView
+
+        <!-- Tên đạo diễn/diễn viên -->
+
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/person_image"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_gravity="center_horizontal"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/circle_shape"
             android:scaleType="centerCrop"
-            android:background="@drawable/circle_shape" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Tên đạo diễn/diễn viên -->
         <TextView
             android:id="@+id/person_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="8dp"
             android:textColor="@color/white"
             android:textSize="14sp"
             android:textStyle="bold"
-            android:gravity="center"
-            android:paddingTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/person_image"
             tools:text="Anthony Russo" />
 
-    </LinearLayout>
+        <ImageButton
+            android:id="@+id/removeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="-10dp"
+            android:visibility="gone"
+            android:background="@drawable/back_button_effect"
+            app:layout_constraintStart_toEndOf="@+id/person_image"
+            app:layout_constraintTop_toTopOf="@+id/person_image"
+            app:srcCompat="@drawable/ic_remove" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

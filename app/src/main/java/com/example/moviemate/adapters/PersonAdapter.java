@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,14 +17,22 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonViewHolder> {
 
     private Context context;
     private List<Person> personList;
+    private boolean showRemoveButton;
 
-    public PersonAdapter(Context context, List<Person> personList) {
+    public PersonAdapter(Context context, List<Person> personList, boolean showRemoveButton) {
         this.context = context;
         this.personList = personList;
+        this.showRemoveButton = showRemoveButton;
+    }
+
+    public List<Person> getPersonList() {
+        return personList;
     }
 
     @NonNull
@@ -38,6 +47,16 @@ public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonView
         Person person = personList.get(position);
         holder.personName.setText(person.getName());
         Picasso.get().load(person.getPicUrl()).into(holder.personImage);
+
+        if (showRemoveButton) {
+            holder.removeButton.setVisibility(View.VISIBLE);
+            holder.removeButton.setOnClickListener(v -> {
+                personList.remove(position);
+                notifyDataSetChanged();
+            });
+        } else {
+            holder.removeButton.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -47,12 +66,14 @@ public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonView
 
     public static class PersonViewHolder extends RecyclerView.ViewHolder {
         TextView personName;
-        ImageView personImage;
+        CircleImageView personImage;
+        ImageButton removeButton;
 
         public PersonViewHolder(@NonNull View itemView) {
             super(itemView);
             personName = itemView.findViewById(R.id.person_name);
             personImage = itemView.findViewById(R.id.person_image);
+            removeButton = itemView.findViewById(R.id.removeButton);
         }
     }
 }
