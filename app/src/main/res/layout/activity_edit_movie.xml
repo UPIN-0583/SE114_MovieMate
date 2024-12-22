@@ -51,7 +51,6 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout17" />
 
@@ -354,7 +353,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/directorRecylerView"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="150dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView15" />
@@ -373,7 +372,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/actorRecyclerView"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="150dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView17" />
@@ -385,10 +384,11 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="72dp"
             android:layout_marginEnd="16dp"
+            android:layout_marginBottom="32dp"
             android:background="@drawable/round_button_effect"
             android:text="@string/save"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/showTimeRecyclerView" />
 
@@ -428,7 +428,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/showTimeRecyclerView"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="100dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView21" />
