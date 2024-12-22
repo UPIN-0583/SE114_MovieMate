@@ -14,6 +14,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
@@ -34,6 +35,8 @@ import com.example.moviemate.models.Movie;
 import com.example.moviemate.models.MovieDateTime;
 import com.example.moviemate.models.Person;
 import com.example.moviemate.utils.CustomDialog;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.kunzisoft.switchdatetime.SwitchDateTimeDialogFragment;
 import com.squareup.picasso.Picasso;
 
@@ -53,7 +56,7 @@ public class EditMovieActivity extends AppCompatActivity {
     Button saveButton;
     ImageView movieBanner;
     TextView addDirectorTv, addActorTv, addShowTimeTv;
-    EditText timeHourEt, timeMinuteEt, yearEt, languageEt, ratingEt, statusEt, titleEt, genreEt, storylineEt,  trailerEt;
+    EditText timeHourEt, timeMinuteEt, yearEt, priceEt, languageEt, ratingEt, titleEt, genreEt, storylineEt,  trailerEt;
     Spinner statusSpinner;
     RecyclerView directorRv, actorRv, showTimeRv;
     private PersonAdapter directorAdapter, actorAdapter;
@@ -127,7 +130,9 @@ public class EditMovieActivity extends AppCompatActivity {
             editPoster();
         });
         saveButton = findViewById(R.id.saveButton);
-        saveButton.setOnClickListener(v -> {});
+        saveButton.setOnClickListener(v -> {
+            update();
+        });
 
         movieBanner = findViewById(R.id.movieBanner);
 
@@ -136,12 +141,138 @@ public class EditMovieActivity extends AppCompatActivity {
         yearEt = findViewById(R.id.yearEditText);
         languageEt = findViewById(R.id.languageEditText);
         ratingEt = findViewById(R.id.ratingEditText);
-//        statusEt = findViewById(R.id.);
+        priceEt = findViewById(R.id.priceEditText);
         titleEt = findViewById(R.id.titleEditText);
         genreEt = findViewById(R.id.genreTextEdit);
         storylineEt = findViewById(R.id.storylineTextEdit);
         trailerEt = findViewById(R.id.trailerUrlTextEdit);
         statusSpinner = findViewById(R.id.statusSpinner);
+    }
+
+    private void update() {
+        saveButton.setEnabled(false);
+        Toast.makeText(this, "Updating movie...", Toast.LENGTH_SHORT).show();
+        if (!checkData()) return;
+        updateMovie();
+        updateShowTime();
+        saveButton.setEnabled(true);
+    }
+
+    private boolean checkData() {
+        if (titleEt.getText().toString().isEmpty()) {
+            CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Error", "Title cannot be empty", false);
+            return false;
+        }
+
+        if (timeHourEt.getText().toString().isEmpty() || timeMinuteEt.getText().toString().isEmpty()) {
+            CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Error", "Time cannot be empty", false);
+            return false;
+        }
+
+        if (yearEt.getText().toString().isEmpty()) {
+            CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Error", "Year cannot be empty", false);
+            return false;
+        }
+
+        if (priceEt.getText().toString().isEmpty()) {
+            CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Error", "Price cannot be empty", false);
+            return false;
+        }
+
+        if (languageEt.getText().toString().isEmpty()) {
+            CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Error", "Language cannot be empty", false);
+            return false;
+        }
+
+        if (ratingEt.getText().toString().isEmpty()) {
+            CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Error", "Rating cannot be empty", false);
+            return false;
+        }
+
+        if (genreEt.getText().toString().isEmpty()) {
+            CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Error", "Genre cannot be empty", false);
+            return false;
+        }
+
+        if (trailerEt.getText().toString().isEmpty()) {
+            CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Error", "Trailer cannot be empty", false);
+            return false;
+        }
+
+        if (storylineEt.getText().toString().isEmpty()) {
+            CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Error", "Storyline cannot be empty", false);
+            return false;
+        }
+
+        if (directors.isEmpty()) {
+            CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Error", "Director cannot be empty", false);
+            return false;
+        }
+
+        if (actors.isEmpty()) {
+            CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Error", "Actor cannot be empty", false);
+            return false;
+        }
+
+        return true;
+    }
+
+    private String uploadMoviePoster() {
+        if (posterUri == null) return movie.getPoster(); // No change
+
+
+
+        return "";
+    }
+    private void updateMovie() {
+        String title = titleEt.getText().toString();
+        String time = timeHourEt.getText().toString() + "h " + timeMinuteEt.getText().toString() + "m";
+        int year = Integer.parseInt(yearEt.getText().toString());
+        String status = statusSpinner.getSelectedItem().toString();
+        int price = Integer.parseInt(priceEt.getText().toString());
+        String language = languageEt.getText().toString();
+        String rating = ratingEt.getText().toString();
+        String genre = genreEt.getText().toString();
+        String trailer = trailerEt.getText().toString();
+        String storyline = storylineEt.getText().toString();
+
+        List<String> genres = new ArrayList<>();
+        for (String g : genre.split(",")) {
+            genres.add(g.trim());
+        }
+
+        String moviePosterUrl = uploadMoviePoster();
+
+        Movie updatedMovie = new Movie();
+        updatedMovie.setMovieID(movie.getMovieID());
+        updatedMovie.setImdb(movie.getImdb());
+        updatedMovie.setPoster(moviePosterUrl);
+        updatedMovie.setTitle(title);
+        updatedMovie.setTime(time);
+        updatedMovie.setYear(year);
+        updatedMovie.setStatus(status);
+        updatedMovie.setSeatPrice(price);
+        updatedMovie.setLanguage(language);
+        updatedMovie.setRating(rating);
+        updatedMovie.setGenre(genres);
+        updatedMovie.setTrailer(trailer);
+        updatedMovie.setDescription(storyline);
+        updatedMovie.setDirector(directorAdapter.getPersonList());
+        updatedMovie.setActor(actorAdapter.getPersonList());
+
+        String movieId = "Movie" + String.valueOf(updatedMovie.getMovieID());
+        DatabaseReference movieRef = FirebaseDatabase.getInstance().getReference("Movies").child(movieId);
+        movieRef.setValue(updatedMovie).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                CustomDialog.showAlertDialog(this, R.drawable.ic_success, "Success", "Movie updated successfully", true);
+            } else {
+                CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Error", Objects.requireNonNull(task.getException()).getMessage(), false);
+            }
+        });
+    }
+
+    private void updateShowTime() {
+
     }
 
     private void addShowTime() {
@@ -163,7 +294,15 @@ public class EditMovieActivity extends AppCompatActivity {
                     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
                     String selectedDateTime = format.format(date);
                     String[] dateTime = selectedDateTime.split(" ");
-                    dateTimes.add(new MovieDateTime(dateTime[0], dateTime[1]));
+
+                    MovieDateTime movieDateTime = new MovieDateTime(dateTime[0], dateTime[1]);
+                    for (MovieDateTime mdt : dateTimes) {
+                        if (mdt.date.equals(movieDateTime.date) && mdt.time.equals(movieDateTime.time)) {
+                            return; // Ignore if the date and time already exist
+                        }
+                    }
+
+                    dateTimes.add(movieDateTime);
                     showTimeAdapter.notifyDataSetChanged();
                 }
                 catch (Exception e) {
@@ -221,6 +360,7 @@ public class EditMovieActivity extends AppCompatActivity {
         timeHourEt.setText(hour);
         timeMinuteEt.setText(minute);
         yearEt.setText(String.valueOf(movie.getYear()));
+        priceEt.setText(String.valueOf(movie.getSeatPrice()));
 
         directors = movie.getDirector();
         directorRv = findViewById(R.id.directorRecylerView);
