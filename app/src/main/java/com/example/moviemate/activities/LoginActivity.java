@@ -257,6 +257,7 @@ public class LoginActivity extends AppCompatActivity {
             } catch (ApiException e) {
                 Log.w("LoginActivity", "Google sign in failed", e);
                 CustomDialog.showAlertDialog(LoginActivity.this, R.drawable.ic_error, "Error", "Google sign-in failed.", false);
+                findViewById(R.id.google_sign_in_button).setEnabled(true);
             }
         }
     }
