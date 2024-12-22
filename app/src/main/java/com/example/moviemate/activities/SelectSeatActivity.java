@@ -90,6 +90,9 @@ public class SelectSeatActivity extends AppCompatActivity {
         cinemaID = "Cinema" + data.getIntExtra("cinema_id", -1);
         cinemaName = data.getStringExtra("cinema_name");
         movie = (Movie) data.getSerializableExtra("movie");
+        if (movie == null)
+            return;
+        seatPrice = movie.getSeatPrice();
 
         // Ánh xạ các view
         backBtn = findViewById(R.id.BackBtn);
@@ -237,11 +240,6 @@ public class SelectSeatActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 seatMap = new LinkedHashMap<>(); // Giữ nguyên thứ tự ghế khi trả về từ Firebase
-                Integer priceFromDb = snapshot.child("Price").getValue(Integer.class);
-                if (priceFromDb != null) {
-                    seatPrice = priceFromDb;
-                }
-
                 for (DataSnapshot seatSnapshot : snapshot.child("Seats").getChildren()) {
                     String seatKey = seatSnapshot.getKey();
                     String seatStatus = seatSnapshot.getValue(String.class);

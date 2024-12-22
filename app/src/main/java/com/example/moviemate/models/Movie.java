@@ -15,6 +15,7 @@ public class Movie implements Serializable {
     private double Imdb;
     private String Time;
     private int Year;
+    private int SeatPrice;
     private String Status;
     private List<Person> Actor;
     private List<Person> Director;
@@ -26,7 +27,7 @@ public class Movie implements Serializable {
 
     // Constructor đầy đủ
     public Movie(int movieID, String title, String description, String poster, String trailer,
-                 String language, String rating, double imdb, String time, int year,
+                 String language, String rating, double imdb, String time, int year, int seatPrice,
                  String status, List<Person> actor, List<Person> director, List<String> genre, Map<String, Map<String, ShowTime>> showTimes) {
         this.MovieID = movieID;
         this.Title = title;
@@ -38,6 +39,7 @@ public class Movie implements Serializable {
         this.Imdb = imdb;
         this.Time = time;
         this.Year = year;
+        this.SeatPrice = seatPrice;
         this.Status = status;
         this.Actor = actor;
         this.Director = director;
@@ -65,6 +67,13 @@ public class Movie implements Serializable {
         return Description;
     }
 
+    public int getSeatPrice() {
+        return SeatPrice;
+    }
+
+    public void setSeatPrice(int seatPrice) {
+        SeatPrice = seatPrice;
+    }
     public void setDescription(String description) {
         Description = description;
     }
