@@ -183,26 +183,6 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
                 for (DataSnapshot cinemaSnapshot : snapshot.getChildren()) {
                     Cinema cinema = cinemaSnapshot.getValue(Cinema.class);
                     if (cinema != null) {
-                        List<ShowTime> showTimeList = new ArrayList<>();
-
-                        DataSnapshot movieSnapshot = cinemaSnapshot.child("Movies").child("Movie" + movie.getMovieID()).child("ShowTimes");
-
-                        // Lặp qua từng ngày chiếu trong ShowTimes
-                        for (DataSnapshot daySnapshot : movieSnapshot.getChildren()) {
-                            String day = daySnapshot.getKey();
-
-                            // Lặp qua từng giờ chiếu trong ngày
-                            for (DataSnapshot timeSnapshot : daySnapshot.getChildren()) {
-                                ShowTime showTime = timeSnapshot.getValue(ShowTime.class);
-                                if (showTime != null) {
-                                    showTime.setDay(day);
-                                    showTime.setMovieID(movie.getMovieID());
-                                    showTimeList.add(showTime);
-                                }
-                            }
-                        }
-
-                        cinema.setShowTimeList(showTimeList);
                         cinemaList.add(cinema);
                     }
                 }
