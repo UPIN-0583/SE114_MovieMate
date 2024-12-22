@@ -16,6 +16,7 @@ import com.example.moviemate.fragments.AdminMoviesFragment;
 import com.example.moviemate.fragments.AdminPanelFragment;
 import com.example.moviemate.fragments.AdminStatisticFragment;
 import com.example.moviemate.fragments.AdminUsersFragment;
+import com.example.moviemate.fragments.TicketFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -46,6 +47,8 @@ public class AdminMainActivity extends AppCompatActivity {
 
             if (item.getItemId() == R.id.navAdminMovies)
                 selectedFragment = new AdminMoviesFragment();
+            else if (item.getItemId() == R.id.navAdminTickets)
+                selectedFragment = new TicketFragment();
             else if (item.getItemId() == R.id.navAdminUsers)
                 selectedFragment = new AdminUsersFragment();
             else if (item.getItemId() == R.id.navAdminStatistic)

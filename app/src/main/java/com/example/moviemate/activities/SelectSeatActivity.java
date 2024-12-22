@@ -2,6 +2,7 @@ package com.example.moviemate.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
@@ -16,6 +17,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.cloudinary.android.MediaManager;
+import com.cloudinary.android.callback.ErrorInfo;
+import com.cloudinary.android.callback.UploadCallback;
 import com.example.moviemate.R;
 import com.example.moviemate.adapters.DayAdapter;
 import com.example.moviemate.adapters.TimeAdapter;
@@ -46,6 +50,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import io.github.cdimascio.dotenv.Dotenv;
 
 public class SelectSeatActivity extends AppCompatActivity {
     private int totalTimeLeft = 1200000; // Tổng thời gian đặt ghế, thanh toán là 20 phút
@@ -84,6 +90,9 @@ public class SelectSeatActivity extends AppCompatActivity {
         cinemaID = "Cinema" + data.getIntExtra("cinema_id", -1);
         cinemaName = data.getStringExtra("cinema_name");
         movie = (Movie) data.getSerializableExtra("movie");
+        if (movie == null)
+            return;
+        seatPrice = movie.getSeatPrice();
 
         // Ánh xạ các view
         backBtn = findViewById(R.id.BackBtn);
@@ -168,7 +177,7 @@ public class SelectSeatActivity extends AppCompatActivity {
                 .child("Movie" + movie.getMovieID())
                 .child("ShowTimes");
 
-        cinemaRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        cinemaRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 dateList.clear();
@@ -189,7 +198,15 @@ public class SelectSeatActivity extends AppCompatActivity {
     }
 
     private void setupDateAdapter() {
-        DayAdapter dayAdapter = new DayAdapter(this, dateList, date -> {
+        DayAdapter dayAdapter = new DayAdapter(this, dateList, selectedDate, date -> {
+            if (selectedDate != null && selectedDate.equals(date)) return; // Không cần fetch lại nếu chọn ngày cũ
+
+            restoreSeatStatus(); // Huỷ giữ chỗ ghế khi chọn ngày mới
+            selectedTime = null; // Reset giờ đã chọn
+            seatGridLayout.removeAllViews(); // Xóa danh sách ghế cũ
+            totalPrice = 0; // Reset tổng giá vé
+            totalPriceTextView.setText(String.format(Locale.getDefault(), "Total: %s VND", MoneyFormatter.formatMoney(this, totalPrice)));
+
             selectedDate = date;
             fetchTimesForSelectedDate(date);
         });
@@ -198,7 +215,7 @@ public class SelectSeatActivity extends AppCompatActivity {
     }
 
     private void fetchTimesForSelectedDate(String date) {
-        cinemaRef.child(date).addListenerForSingleValueEvent(new ValueEventListener() {
+        cinemaRef.child(date).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 timeList.clear();
@@ -219,7 +236,10 @@ public class SelectSeatActivity extends AppCompatActivity {
     }
 
     private void setupTimeAdapter() {
-        TimeAdapter timeAdapter = new TimeAdapter(this, timeList, time -> {
+        TimeAdapter timeAdapter = new TimeAdapter(this, timeList, selectedTime, time -> {
+            if (selectedTime != null && selectedTime.equals(time)) return; // Không cần fetch lại nếu chọn giờ cũ
+
+            restoreSeatStatus(); // Huỷ giữ chỗ ghế khi chọn giờ mới
             selectedTime = time;
             fetchSeatsForSelectedTime(selectedDate, time);
         });
@@ -227,15 +247,12 @@ public class SelectSeatActivity extends AppCompatActivity {
     }
 
     private void fetchSeatsForSelectedTime(String date, String time) {
+        if (date == null || time == null) return;
+
         cinemaRef.child(date).child(time).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 seatMap = new LinkedHashMap<>(); // Giữ nguyên thứ tự ghế khi trả về từ Firebase
-                Integer priceFromDb = snapshot.child("Price").getValue(Integer.class);
-                if (priceFromDb != null) {
-                    seatPrice = priceFromDb;
-                }
-
                 for (DataSnapshot seatSnapshot : snapshot.child("Seats").getChildren()) {
                     String seatKey = seatSnapshot.getKey();
                     String seatStatus = seatSnapshot.getValue(String.class);
@@ -254,6 +271,8 @@ public class SelectSeatActivity extends AppCompatActivity {
     }
 
     private void setupSeatGrid() {
+        if (selectedDate == null || selectedTime == null) return; // Không hiển thị ghế nếu chưa chọn ngày và giờ
+
         if (seatMap != null && !seatMap.isEmpty()) {
             seatGridLayout.removeAllViews();
             for (Map.Entry<String, String> entry : seatMap.entrySet()) {
@@ -359,25 +378,60 @@ public class SelectSeatActivity extends AppCompatActivity {
 
     // Hàm tải mã vạch lên Firebase Storage và lưu URL vào Database
     private void uploadBarcodeToFirebase(Bitmap barcodeBitmap, String ticketId, Map<String, Object> ticketData) {
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageRef = storage.getReference().child("barcodes/" + ticketId + ".png");
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         barcodeBitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
         byte[] data = baos.toByteArray();
 
-        UploadTask uploadTask = storageRef.putBytes(data);
-        uploadTask.addOnSuccessListener(taskSnapshot -> storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-            // Update barcode
-            userTicketsRef.child(ticketId).child("BarcodeImage").setValue(uri.toString())
-                    .addOnFailureListener(e -> Toast.makeText(this, "Failed to save bar code", Toast.LENGTH_SHORT).show());
-        })).addOnFailureListener(e -> {
-            Toast.makeText(this, "Failed to load bar code", Toast.LENGTH_SHORT).show();
-        });
+        MediaManager.get().upload(data)
+                .option("folder", "barcodes")
+                .option("public_id", ticketId)
+                .option("resource_type", "image")
+                .callback(new UploadCallback() {
+                    @Override
+                    public void onStart(String requestId) {
+
+                    }
+
+                    @Override
+                    public void onProgress(String requestId, long bytes, long totalBytes) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(String requestId, Map resultData) {
+                        Dotenv dotenv = Dotenv.configure().directory("/assets").filename("env").load();
+
+                        String cloudinaryCloudName = dotenv.get("CLOUDINARY_CLOUD_NAME");
+                        String barcodeUrl = "https://res.cloudinary.com/" + cloudinaryCloudName + "/image/upload/q_auto/f_auto/" + resultData.get("public_id");
+
+                        userTicketsRef.child(ticketId).child("BarcodeImage").setValue(barcodeUrl)
+                                .addOnFailureListener(e -> Log.e("UploadBarcode", "Failed to save bar code"));
+                    }
+
+                    @Override
+                    public void onError(String requestId, ErrorInfo error) {
+                        Log.e("UploadBarcode", "Failed to upload bar code: " + error.getDescription());
+                    }
+
+                    @Override
+                    public void onReschedule(String requestId, ErrorInfo error) {
+
+                    }
+                })
+                .dispatch();
     }
 
     // Huỷ giữ chỗ khi bấm back hoặc hết thời gian
     private void cancelHolding() {
+        timer.cancel();
+
+        Thread thread = new Thread(this::restoreSeatStatus);
+        thread.start();
+    }
+
+    private void restoreSeatStatus() {
+        if (selectedDate == null || selectedTime == null || selectedSeats == null) return;
+
         DatabaseReference seatRef = FirebaseDatabase.getInstance().getReference("Cinemas")
                 .child(cinemaID)
                 .child("Movies")
@@ -394,7 +448,7 @@ public class SelectSeatActivity extends AppCompatActivity {
                     });
         }
 
-        timer.cancel();
+        selectedSeats.clear();
     }
 
     // Countdown timer

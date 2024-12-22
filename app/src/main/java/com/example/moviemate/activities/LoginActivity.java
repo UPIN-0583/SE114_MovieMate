@@ -1,5 +1,6 @@
 package com.example.moviemate.activities;
 
+import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
@@ -9,12 +10,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.splashscreen.SplashScreen;
 
 
+import com.example.moviemate.MovieMateApp;
 import com.example.moviemate.R;
 
 import com.example.moviemate.models.User;
@@ -26,7 +29,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.Firebase;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -103,7 +105,22 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void autoLogin(FirebaseUser currentUser) {
-        // Kiểm tra xem người dùng có phải là admin hay không
+        // Check if user is valid
+        userRef.child(currentUser.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    isDataLoaded.set(true);
+                    return;
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
         userRef.child(currentUser.getUid()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
@@ -118,6 +135,12 @@ public class LoginActivity extends AppCompatActivity {
                 if (user == null)
                     return;
 
+                if (user.isBanned) {
+                    isDataLoaded.set(true);
+                    CustomDialog.showAlertDialog(LoginActivity.this, R.drawable.ic_error, "Notice", "Your account has been banned. Contact admin for help.", false);
+                    return;
+                }
+
                 Intent intent;// Prevent user from going back to login screen
                 if (user.role.equals("admin")) {
                     intent = new Intent(LoginActivity.this, AdminMainActivity.class);
@@ -129,6 +152,9 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
                 isDataLoaded.set(true);
+
+                MovieMateApp app = (MovieMateApp) getApplication();
+                app.startTracking(currentUser.getUid());
             }
         });
     }
@@ -192,6 +218,9 @@ public class LoginActivity extends AppCompatActivity {
                                     startActivity(intent);
                                     finish(); // Prevent user from going back to login screen
                                 }
+
+                                MovieMateApp app = (MovieMateApp) getApplication();
+                                app.startTracking(user.id);
                             }
 
                             @Override
@@ -207,6 +236,8 @@ public class LoginActivity extends AppCompatActivity {
 
     // Hàm để khởi động quá trình đăng nhập Google
     private void signInWithGoogle() {
+        findViewById(R.id.google_sign_in_button).setEnabled(false);
+        Toast.makeText(LoginActivity.this, "Signing in with Google...", Toast.LENGTH_SHORT).show();
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
@@ -226,6 +257,7 @@ public class LoginActivity extends AppCompatActivity {
             } catch (ApiException e) {
                 Log.w("LoginActivity", "Google sign in failed", e);
                 CustomDialog.showAlertDialog(LoginActivity.this, R.drawable.ic_error, "Error", "Google sign-in failed.", false);
+                findViewById(R.id.google_sign_in_button).setEnabled(true);
             }
         }
     }
@@ -241,7 +273,7 @@ public class LoginActivity extends AppCompatActivity {
                             return;
 
                         checkAndSaveUserToDatabase(user);
-                        userRef.child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        userRef.child(user.getUid()).addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 User user = snapshot.getValue(User.class);
@@ -251,14 +283,19 @@ public class LoginActivity extends AppCompatActivity {
                                 if (user.role.equals("admin")) {
                                     Intent intent = new Intent(LoginActivity.this, AdminMainActivity.class);
                                     startActivity(intent);
+                                    findViewById(R.id.google_sign_in_button).setEnabled(true);
                                     finish();
                                 }
                                 else {
                                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                     intent.putExtra("user", user);
                                     startActivity(intent);
+                                    findViewById(R.id.google_sign_in_button).setEnabled(true);
                                     finish();
                                 }
+
+                                MovieMateApp app = (MovieMateApp) getApplication();
+                                app.startTracking(user.id);
                             }
 
                             @Override
@@ -283,7 +320,7 @@ public class LoginActivity extends AppCompatActivity {
                 // Nếu người dùng chưa tồn tại trong Database, tạo bản ghi mới
                 String email = firebaseUser.getEmail();
                 String name = firebaseUser.getDisplayName();
-                User user = new User(name, null, email, null, "user");
+                User user = new User(uid, name, null, email, null, "user", false);
 
                 userRef.setValue(user)
                         .addOnSuccessListener(aVoid -> Log.d("LoginActivity", "User saved to database"))

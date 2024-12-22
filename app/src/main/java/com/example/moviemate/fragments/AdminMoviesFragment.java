@@ -13,6 +13,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
 import com.example.moviemate.R;
+import com.example.moviemate.activities.AddMovieActivity;
 import com.example.moviemate.activities.SearchActivity;
 import com.example.moviemate.adapters.MoviePagerAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -78,6 +79,8 @@ public class AdminMoviesFragment extends Fragment {
     }
 
     private void addMovie() {
+        Intent intent = new Intent(getContext(), AddMovieActivity.class);
+        startActivity(intent);
     }
 
     private void toggleFabMenu() {

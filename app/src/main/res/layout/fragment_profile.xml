@@ -56,7 +56,7 @@
             android:layout_width="125dp"
             android:layout_height="125dp"
             android:contentDescription="@string/user_avatar"
-            android:src="@drawable/ic_default_avatar"
+            android:src="@drawable/default_user_avatar"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

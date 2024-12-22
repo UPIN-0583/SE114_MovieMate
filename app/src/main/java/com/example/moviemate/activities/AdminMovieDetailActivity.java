@@ -11,8 +11,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -33,19 +37,25 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MovieDetailActivity extends AppCompatActivity {
+public class AdminMovieDetailActivity extends AppCompatActivity {
 
     private ImageView moviePoster;
     private TextView movieTitle, movieGenre, movieRating, movieLanguage, movieTime, movieDescription, cinemaSectionTitle;
     private RecyclerView cinemaRecyclerView, directorRecyclerView, actorRecyclerView;
     private Button watchTrailerButton, continueButton;
     private Movie movie;
-    private Cinema selectedCinema; // Rạp được chọn
+    private Cinema selectedCinema;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_movie_detail);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_admin_movie_detail);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
         // Khởi tạo các view
         ImageButton backBtn = findViewById(R.id.BackBtn);
@@ -65,13 +75,13 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         // Nhận movie từ Intent
         Intent intent = getIntent();
-        int movieID = intent.getIntExtra("movieId", -1);
-        if (movieID == -1) {
+        int movieId = intent.getIntExtra("movieId", -1);
+        if (movieId == -1) {
             finish();
             return;
         }
 
-        fetchMovie(movieID);
+        fetchMovieDetail(movieId);
 
         backBtn.setOnClickListener(v -> finish());
 
@@ -90,19 +100,26 @@ public class MovieDetailActivity extends AppCompatActivity {
         // Xử lý khi nhấn nút "Continue"
         continueButton.setOnClickListener(v -> {
             if (selectedCinema != null) {
-                Intent selectSeatIntent = new Intent(MovieDetailActivity.this, SelectSeatActivity.class);
+                Intent selectSeatIntent = new Intent(AdminMovieDetailActivity.this, SelectSeatActivity.class);
                 selectSeatIntent.putExtra("cinema_id", selectedCinema.getCinemaID());
                 selectSeatIntent.putExtra("cinema_name", selectedCinema.getCinemaName());
                 selectSeatIntent.putExtra("movie", movie);
                 startActivity(selectSeatIntent);
             } else {
-                Toast.makeText(MovieDetailActivity.this, "Please select a cinema first", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AdminMovieDetailActivity.this, "Please select a cinema first", Toast.LENGTH_SHORT).show();
             }
+        });
+
+        TextView editMovie = findViewById(R.id.editMovieTextView);
+        editMovie.setOnClickListener(v -> {
+            Intent editMovieIntent = new Intent(AdminMovieDetailActivity.this, EditMovieActivity.class);
+            editMovieIntent.putExtra("movie", movie);
+            startActivity(editMovieIntent);
         });
     }
 
-    private void fetchMovie(int movieID) {
-        DatabaseReference movieRef = FirebaseDatabase.getInstance().getReference("Movies").child("Movie" + movieID);
+    private void fetchMovieDetail(int movieId) {
+        DatabaseReference movieRef = FirebaseDatabase.getInstance().getReference("Movies").child("Movie" + movieId);
 
         movieRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -110,7 +127,7 @@ public class MovieDetailActivity extends AppCompatActivity {
                 movie = snapshot.getValue(Movie.class);
 
                 if (movie == null) {
-                    Toast.makeText(MovieDetailActivity.this, "Movie not found", Toast.LENGTH_SHORT).show();
+                    Log.d("AdminMovieDetailActivity", "Movie not found");
                     finish();
                     return;
                 }
@@ -121,7 +138,7 @@ public class MovieDetailActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(MovieDetailActivity.this, "Error fetching movie", Toast.LENGTH_SHORT).show();
+
             }
         });
     }
@@ -175,7 +192,7 @@ public class MovieDetailActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(MovieDetailActivity.this, "Error fetching cinemas", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AdminMovieDetailActivity.this, "Error fetching cinemas", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -193,7 +210,7 @@ public class MovieDetailActivity extends AppCompatActivity {
             cinemaSectionTitle.setVisibility(View.VISIBLE);
             continueButton.setVisibility(View.VISIBLE);
         } else {
-            Log.d("MovieDetailActivity", "No cinemas found for this movie.");
+            Log.d("AdminMovieDetailActivity", "No cinemas found for this movie.");
             cinemaSectionTitle.setVisibility(View.GONE);
             cinemaRecyclerView.setVisibility(View.GONE);
             continueButton.setVisibility(View.GONE);

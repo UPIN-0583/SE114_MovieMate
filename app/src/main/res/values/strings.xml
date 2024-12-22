@@ -84,4 +84,28 @@
         <item>Yearly Statistics</item>
     </string-array>
 
+    <string-array name="movie_status">
+        <item>Now Playing</item>
+        <item>Coming Soon</item>
+    </string-array>
+
+    <string name="total_users">Total Users</string>
+    <string name="active_users">Active Users</string>
+    <string name="banned_users">Banned Users</string>
+    <string name="banned">Banned</string>
+    <string name="active">Active</string>
+    <string name="tickets">Tickets</string>
+    <string name="edit_movie">Edit Movie</string>
+    <string name="genre">Genre</string>
+    <string name="trailer_url">Trailer URL</string>
+    <string name="add">+ Add</string>
+    <string name="year">Year:</string>
+    <string name="show_time">Show time</string>
+    <string name="title">Title</string>
+    <string name="change">Change</string>
+    <string name="name">Name</string>
+    <string name="price">Price:</string>
+    <string name="status">Status:</string>
+    <string name="show_time_duplicate_datetime_will_be_ignored">Show time (duplicate datetime will be ignored)</string>
+    <string name="add_movie">Add Movie</string>
 </resources>

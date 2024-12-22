@@ -36,11 +36,20 @@ Dotenv dotenv = Dotenv.configure()
 
 dotenv.get("PAYOS_API_KEY");
 ```
-
-### 2.4. Lấy API key của PayOS:
+## 3. Cấu hình PayOS
+### 3.1. Lấy API key của PayOS:
 1. Đăng nhập [PayOS Dashboard](https://my.payos.vn/)
 2. Chọn tổ chức
 3. Chọn "Kênh thanh toán"
 4. Chọn "MovieMate"
 
 ![image](https://github.com/user-attachments/assets/c004934f-aabb-4e2c-853e-22edb5fbf55c)
+
+## 4. Cấu hình Cloudinary
+### 4.1. Lấy API key của Cloudinary:
+1. Đăng nhập [Cloudinary](https://cloudinary.com/)
+2. Mở Settings ở góc dưới, bên trái -> Chọn API Keys (tại đây sẽ có đủ thông tin cần thiết)
+
+![image](https://github.com/user-attachments/assets/4294c2cf-a250-4f3b-a23a-a333a524c30d)
+
+3. Copy các giá trị vào file `/assets/env` theo mẫu trong `/assets/env.template`

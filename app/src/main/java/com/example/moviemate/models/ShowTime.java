@@ -6,7 +6,6 @@ import java.util.Map;
 public class ShowTime implements Serializable {
     private String showTimeID;  // ID của suất chiếu
     private Integer movieID;    // ID của phim
-    private Long price;         // Giá vé
     private Map<String, String> seats;  // Trạng thái ghế (ví dụ: "A1": "available")
     private String time;        // Giờ chiếu
     private String day;         // Ngày chiếu
@@ -16,10 +15,9 @@ public class ShowTime implements Serializable {
     }
 
     // Constructor đầy đủ để khởi tạo ShowTime
-    public ShowTime(String showTimeID, Integer movieID, Long price, Map<String, String> seats, String time, String day) {
+    public ShowTime(String showTimeID, Integer movieID, Map<String, String> seats, String time, String day) {
         this.showTimeID = showTimeID;
         this.movieID = movieID;
-        this.price = price;
         this.seats = seats;
         this.time = time;
         this.day = day;
@@ -40,14 +38,6 @@ public class ShowTime implements Serializable {
 
     public void setMovieID(Integer movieID) {
         this.movieID = movieID;
-    }
-
-    public Long getPrice() {
-        return price;
-    }
-
-    public void setPrice(Long price) {
-        this.price = price;
     }
 
     public Map<String, String> getSeats() {
