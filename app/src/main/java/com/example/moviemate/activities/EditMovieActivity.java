@@ -3,9 +3,13 @@ package com.example.moviemate.activities;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -19,6 +23,7 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,6 +33,10 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.android.MediaManager;
+import com.cloudinary.android.callback.ErrorInfo;
+import com.cloudinary.android.callback.UploadCallback;
 import com.example.moviemate.R;
 import com.example.moviemate.adapters.MovieDateTimeAdapter;
 import com.example.moviemate.adapters.PersonAdapter;
@@ -35,18 +44,28 @@ import com.example.moviemate.models.Movie;
 import com.example.moviemate.models.MovieDateTime;
 import com.example.moviemate.models.Person;
 import com.example.moviemate.utils.CustomDialog;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.kunzisoft.switchdatetime.SwitchDateTimeDialogFragment;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
+
+import id.zelory.compressor.Compressor;
+import io.github.cdimascio.dotenv.Dotenv;
 
 public class EditMovieActivity extends AppCompatActivity {
     private Movie movie;
@@ -65,6 +84,7 @@ public class EditMovieActivity extends AppCompatActivity {
     private List<MovieDateTime> dateTimes;
     private List<String> showTimes;
     private Uri posterUri;
+    private Cloudinary cloudinary;
 
     private ActivityResultLauncher<Intent> launcher;
 
@@ -85,6 +105,9 @@ public class EditMovieActivity extends AppCompatActivity {
         setupViews();
         loadMovieData();
         initLauncher();
+
+        Dotenv dotenv = Dotenv.configure().directory("/assets").filename("env").load();
+        cloudinary = new Cloudinary(dotenv.get("CLOUDINARY_URL"));
     }
 
     private void initLauncher() {
@@ -153,7 +176,7 @@ public class EditMovieActivity extends AppCompatActivity {
         saveButton.setEnabled(false);
         Toast.makeText(this, "Updating movie...", Toast.LENGTH_SHORT).show();
         if (!checkData()) return;
-        updateMovie();
+        uploadMoviePoster();
         updateShowTime();
         saveButton.setEnabled(true);
     }
@@ -217,14 +240,125 @@ public class EditMovieActivity extends AppCompatActivity {
         return true;
     }
 
-    private String uploadMoviePoster() {
-        if (posterUri == null) return movie.getPoster(); // No change
+    private String getRealPathFromUri(Uri uri) {
+        String[] projection = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
+        if (cursor == null) return null;
 
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String path = cursor.getString(column_index);
+        cursor.close();
 
-
-        return "";
+        return path;
     }
-    private void updateMovie() {
+
+    private void uploadMoviePoster() {
+        if (posterUri == null) {
+            updateMovie(movie.getPoster()); // No change
+            return;
+        }
+
+        // Remove the previous poster
+        String posterUrl = movie.getPoster();
+        String oldPublicId = posterUrl.substring(posterUrl.lastIndexOf("/") + 1);
+        try {
+            cloudinary.uploader().destroy(oldPublicId, null);
+        }
+        catch (Exception e) {
+            // Ignore
+        }
+
+        String path = getRealPathFromUri(posterUri);
+
+        Compressor compressor = new Compressor(this)
+                .setCompressFormat(Bitmap.CompressFormat.WEBP)
+                .setQuality(70);
+
+        try {
+            File compressedPoster = compressor.compressToFile(new File(path));
+
+            String publicId = movie.getTitle().replace(" ", "_") + "_" + System.currentTimeMillis();
+            MediaManager.get().upload(compressedPoster.getPath())
+                    .option("public_id", publicId)
+                    .option("resource_type", "image")
+                    .option("folder", "Movies")
+                    .option("overwrite", true)
+                    .callback(new UploadCallback() {
+                        @Override
+                        public void onStart(String requestId) {
+
+                        }
+
+                        @Override
+                        public void onProgress(String requestId, long bytes, long totalBytes) {
+
+                        }
+
+                        @Override
+                        public void onSuccess(String requestId, Map resultData) {
+                            String publicId = (String) resultData.get("public_id");
+
+                            Dotenv dotenv = Dotenv.configure().directory("/assets").filename("env").load();
+                            String cloudName = dotenv.get("CLOUDINARY_CLOUD_NAME");
+                            String imageUrl = String.format("https://res.cloudinary.com/%s/image/upload/q_auto/f_auto/%s", cloudName, publicId);
+
+                            updateMovie(imageUrl);
+                        }
+
+                        @Override
+                        public void onError(String requestId, ErrorInfo error) {
+
+                        }
+
+                        @Override
+                        public void onReschedule(String requestId, ErrorInfo error) {
+
+                        }
+                    }).dispatch();
+        } catch (Exception e) {
+            Log.e("Compressor", Objects.requireNonNull(e.getMessage()));
+            String publicId = movie.getTitle().replace(" ", "_") + "_" + System.currentTimeMillis();
+            MediaManager.get().upload(posterUri)
+                    .option("public_id", publicId)
+                    .option("resource_type", "image")
+                    .option("folder", "Movies")
+                    .option("overwrite", true)
+                    .callback(new UploadCallback() {
+                        @Override
+                        public void onStart(String requestId) {
+
+                        }
+
+                        @Override
+                        public void onProgress(String requestId, long bytes, long totalBytes) {
+
+                        }
+
+                        @Override
+                        public void onSuccess(String requestId, Map resultData) {
+                            String publicId = (String) resultData.get("public_id");
+
+                            Dotenv dotenv = Dotenv.configure().directory("/assets").filename("env").load();
+                            String cloudName = dotenv.get("CLOUDINARY_CLOUD_NAME");
+                            String imageUrl = String.format("https://res.cloudinary.com/%s/image/upload/q_auto/f_auto/%s", cloudName, publicId);
+
+                            updateMovie(imageUrl);
+                        }
+
+                        @Override
+                        public void onError(String requestId, ErrorInfo error) {
+
+                        }
+
+                        @Override
+                        public void onReschedule(String requestId, ErrorInfo error) {
+
+                        }
+                    }).dispatch();
+        }
+    }
+    private void updateMovie(String moviePosterUrl) {
         String title = titleEt.getText().toString();
         String time = timeHourEt.getText().toString() + "h " + timeMinuteEt.getText().toString() + "m";
         int year = Integer.parseInt(yearEt.getText().toString());
@@ -240,8 +374,6 @@ public class EditMovieActivity extends AppCompatActivity {
         for (String g : genre.split(",")) {
             genres.add(g.trim());
         }
-
-        String moviePosterUrl = uploadMoviePoster();
 
         Movie updatedMovie = new Movie();
         updatedMovie.setMovieID(movie.getMovieID());
@@ -260,7 +392,7 @@ public class EditMovieActivity extends AppCompatActivity {
         updatedMovie.setDirector(directorAdapter.getPersonList());
         updatedMovie.setActor(actorAdapter.getPersonList());
 
-        String movieId = "Movie" + String.valueOf(updatedMovie.getMovieID());
+        String movieId = "Movie" + updatedMovie.getMovieID();
         DatabaseReference movieRef = FirebaseDatabase.getInstance().getReference("Movies").child(movieId);
         movieRef.setValue(updatedMovie).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -272,7 +404,40 @@ public class EditMovieActivity extends AppCompatActivity {
     }
 
     private void updateShowTime() {
+        DatabaseReference showTimeRef = FirebaseDatabase.getInstance().getReference("Cinemas")
+                .child("Cinema1")
+                .child("Movies")
+                .child("Movie" + movie.getMovieID())
+                .child("ShowTimes");
 
+        Map<String, String> seatData = new LinkedHashMap<>();
+        for (int i = 'A'; i <= 'E'; i++) {
+            for (int j = 1; j <= 9; j++) {
+                String seat = (char) i + String.valueOf(j);
+                seatData.put(seat, "available");
+            }
+        }
+
+        showTimeRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (MovieDateTime mdt : dateTimes) {
+                    DataSnapshot dateRef = snapshot.child(mdt.date);
+
+                    if (dateRef.child(mdt.time).getValue() != null) {
+                        continue; // Ignore if the date and time already exist
+                    }
+
+                    showTimeRef.child(mdt.date).child(mdt.time).child("ShowTimeID").setValue("Cinema1_Movie" + movie.getMovieID() + "_" + mdt.date + "_" + mdt.time);
+                    showTimeRef.child(mdt.date).child(mdt.time).child("Seats").setValue(seatData);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void addShowTime() {

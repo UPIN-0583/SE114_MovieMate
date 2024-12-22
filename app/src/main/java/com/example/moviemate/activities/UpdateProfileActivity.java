@@ -148,17 +148,15 @@ public class UpdateProfileActivity extends AppCompatActivity {
                 .setCompressFormat(Bitmap.CompressFormat.WEBP)
                 .setQuality(70)
                 .setMaxWidth(125);
-        boolean isCompressed = false;
 
         try {
             // Compress avatar before uploading
             File compressedAvatar = avatarCompressor.compressToFile(new File(getRealPathFromUri(imageUri)));
-            isCompressed = true;
 
             // Upload avatar to Cloudinary
             assert user != null;
             String publicId = user.getUid() + System.currentTimeMillis();
-            String requestID = MediaManager.get().upload(compressedAvatar.getPath())
+            MediaManager.get().upload(compressedAvatar.getPath())
                     .option("folder", "avatars")
                     .option("public_id", publicId)
                     .option("overwrite", true)
@@ -190,10 +188,44 @@ public class UpdateProfileActivity extends AppCompatActivity {
                         @Override
                         public void onReschedule(String requestId, ErrorInfo error) {
                         }
-                    })
-                    .dispatch();
+                    }).dispatch();
         } catch (Exception e) {
-            Log.e("Compressor", "Failed to compress image", e);
+            // Upload avatar to Cloudinary
+            assert user != null;
+            String publicId = user.getUid() + System.currentTimeMillis();
+            MediaManager.get().upload(imageUri)
+                    .option("folder", "avatars")
+                    .option("public_id", publicId)
+                    .option("overwrite", true)
+                    .callback(new UploadCallback() {
+                        @Override
+                        public void onStart(String requestId) {
+                            Toast.makeText(UpdateProfileActivity.this, "Uploading avatar", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onProgress(String requestId, long bytes, long totalBytes) {
+                        }
+
+                        @Override
+                        public void onSuccess(String requestId, Map resultData) {
+                            Toast.makeText(UpdateProfileActivity.this, "Avatar uploaded", Toast.LENGTH_SHORT).show();
+                            Picasso.get().load(imageUri).into(avatarImageView);
+                            saveAvatarUrlToDatabase(user.getUid(), (String) resultData.get("public_id"));
+                        }
+
+                        @Override
+                        public void onError(String requestId, ErrorInfo error) {
+                            CustomDialog.showAlertDialog(UpdateProfileActivity.this,
+                                    R.drawable.ic_error, "Error",
+                                    String.format("Failed to upload avatar due to %s", error.getDescription()),
+                                    false);
+                        }
+
+                        @Override
+                        public void onReschedule(String requestId, ErrorInfo error) {
+                        }
+                    }).dispatch();
         }
     }
 
