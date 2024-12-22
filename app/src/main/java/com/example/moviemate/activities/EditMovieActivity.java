@@ -82,7 +82,6 @@ public class EditMovieActivity extends AppCompatActivity {
     private MovieDateTimeAdapter showTimeAdapter;
     private List<Person> directors, actors;
     private List<MovieDateTime> dateTimes;
-    private List<String> showTimes;
     private Uri posterUri;
     private Cloudinary cloudinary;
 
