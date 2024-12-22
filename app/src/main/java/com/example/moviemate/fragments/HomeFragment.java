@@ -100,7 +100,7 @@ public class HomeFragment extends Fragment {
             usersRef = FirebaseDatabase.getInstance().getReference("Users").child(userID);
 
             // Lấy tên người dùng từ Firebase Database
-            usersRef.child("name").addListenerForSingleValueEvent(new ValueEventListener() {
+            usersRef.child("name").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     String userName = snapshot.getValue(String.class);

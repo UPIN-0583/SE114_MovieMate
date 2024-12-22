@@ -39,7 +39,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     private TextView movieTitle, movieGenre, movieRating, movieLanguage, movieTime, movieDescription, cinemaSectionTitle;
     private RecyclerView cinemaRecyclerView, directorRecyclerView, actorRecyclerView;
     private Button watchTrailerButton, continueButton;
-    private Movie movie; // Movie object được chuyển từ Intent
+    private Movie movie;
     private Cinema selectedCinema; // Rạp được chọn
 
     @Override
@@ -65,14 +65,15 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         // Nhận movie từ Intent
         Intent intent = getIntent();
-        movie = (Movie) intent.getSerializableExtra("movie"); // Lấy movie object từ Intent
+        int movieID = intent.getIntExtra("movieId", -1);
+        if (movieID == -1) {
+            finish();
+            return;
+        }
+
+        fetchMovie(movieID);
 
         backBtn.setOnClickListener(v -> finish());
-
-
-        if (movie == null) finish();
-        displayMovieDetails();
-        fetchCinemasFromFirebase();
 
         // Xử lý khi nhấn nút "Watch Trailer"
         watchTrailerButton.setOnClickListener(v -> {
@@ -96,6 +97,31 @@ public class MovieDetailActivity extends AppCompatActivity {
                 startActivity(selectSeatIntent);
             } else {
                 Toast.makeText(MovieDetailActivity.this, "Please select a cinema first", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void fetchMovie(int movieID) {
+        DatabaseReference movieRef = FirebaseDatabase.getInstance().getReference("Movies").child("Movie" + movieID);
+
+        movieRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                movie = snapshot.getValue(Movie.class);
+
+                if (movie == null) {
+                    Toast.makeText(MovieDetailActivity.this, "Movie not found", Toast.LENGTH_SHORT).show();
+                    finish();
+                    return;
+                }
+
+                displayMovieDetails();
+                fetchCinemasFromFirebase();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(MovieDetailActivity.this, "Error fetching movie", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -132,7 +158,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     private void fetchCinemasFromFirebase() {
         DatabaseReference cinemaRef = FirebaseDatabase.getInstance().getReference("Cinemas");
 
-        cinemaRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        cinemaRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<Cinema> cinemaList = new ArrayList<>();

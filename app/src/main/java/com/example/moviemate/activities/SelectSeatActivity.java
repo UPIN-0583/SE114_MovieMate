@@ -177,7 +177,7 @@ public class SelectSeatActivity extends AppCompatActivity {
                 .child("Movie" + movie.getMovieID())
                 .child("ShowTimes");
 
-        cinemaRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        cinemaRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 dateList.clear();
@@ -207,7 +207,7 @@ public class SelectSeatActivity extends AppCompatActivity {
     }
 
     private void fetchTimesForSelectedDate(String date) {
-        cinemaRef.child(date).addListenerForSingleValueEvent(new ValueEventListener() {
+        cinemaRef.child(date).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 timeList.clear();

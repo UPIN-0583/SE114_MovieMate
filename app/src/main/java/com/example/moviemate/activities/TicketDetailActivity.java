@@ -64,7 +64,7 @@ public class TicketDetailActivity extends AppCompatActivity {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         userTicketsRef = FirebaseDatabase.getInstance().getReference("Tickets").child(userId).child(ticketID);
 
-        userTicketsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        userTicketsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Ticket ticket = snapshot.getValue(Ticket.class);
@@ -109,7 +109,7 @@ public class TicketDetailActivity extends AppCompatActivity {
 
     private void loadCinemaDetails(String cinemaID) {
         DatabaseReference cinemaRef = FirebaseDatabase.getInstance().getReference("Cinemas").child(cinemaID);
-        cinemaRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        cinemaRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
@@ -133,14 +133,14 @@ public class TicketDetailActivity extends AppCompatActivity {
 
     private void loadMovieDetails(String movieID) {
         DatabaseReference movieRef = FirebaseDatabase.getInstance().getReference("Movies").child(movieID);
-        movieRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        movieRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    String title = snapshot.child("Title").getValue(String.class);
-                    String posterUrl = snapshot.child("Poster").getValue(String.class);
-                    String duration = snapshot.child("Time").getValue(String.class);
-                    List<String> genres = (List<String>) snapshot.child("Genre").getValue();
+                    String title = snapshot.child("title").getValue(String.class);
+                    String posterUrl = snapshot.child("poster").getValue(String.class);
+                    String duration = snapshot.child("time").getValue(String.class);
+                    List<String> genres = (List<String>) snapshot.child("genre").getValue();
 
                     movieTitle.setText(title != null ? title : "N/A");
                     movieDuration.setText(duration != null ? duration : "N/A");
@@ -165,7 +165,7 @@ public class TicketDetailActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(TicketDetailActivity.this, "Lỗi khi tải thông tin phim", Toast.LENGTH_SHORT).show();
+                Toast.makeText(TicketDetailActivity.this, "Failed to fetch movie", Toast.LENGTH_SHORT).show();
             }
         });
     }

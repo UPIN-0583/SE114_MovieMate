@@ -62,7 +62,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             Intent intent = new Intent(context, MovieDetailActivity.class);
 
             // Chuyển movie object qua Intent để tránh query lại từ database
-            intent.putExtra("movie", movie);
+            intent.putExtra("movieId", movie.getMovieID());
 
             context.startActivity(intent);
         });

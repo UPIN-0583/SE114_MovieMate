@@ -79,7 +79,7 @@ public class TicketFragment extends Fragment {
     private void loadCinemaAndMovieDetails(Ticket ticket) {
         // Lấy thông tin cinema từ id_cinema
         DatabaseReference cinemaRef = FirebaseDatabase.getInstance().getReference("Cinemas").child(ticket.getCinema());
-        cinemaRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        cinemaRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
@@ -100,12 +100,12 @@ public class TicketFragment extends Fragment {
 
     private void loadMovieDetails(Ticket ticket) {
         DatabaseReference movieRef = FirebaseDatabase.getInstance().getReference("Movies").child(ticket.getMovie());
-        movieRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        movieRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    String movieTitle = snapshot.child("Title").getValue(String.class);
-                    String moviePoster = snapshot.child("Poster").getValue(String.class);
+                    String movieTitle = snapshot.child("title").getValue(String.class);
+                    String moviePoster = snapshot.child("poster").getValue(String.class);
 
                     ticket.setMovieTitle(movieTitle);
                     ticket.setMoviePoster(moviePoster);

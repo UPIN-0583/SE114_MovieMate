@@ -65,7 +65,7 @@ public class AdminStatisticFragment extends Fragment {
     }
 
     private void fetchAvailableData() {
-        ticketsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        ticketsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 availableYears.clear();

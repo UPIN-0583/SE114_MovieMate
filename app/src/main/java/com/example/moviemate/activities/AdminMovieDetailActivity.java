@@ -43,8 +43,8 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
     private TextView movieTitle, movieGenre, movieRating, movieLanguage, movieTime, movieDescription, cinemaSectionTitle;
     private RecyclerView cinemaRecyclerView, directorRecyclerView, actorRecyclerView;
     private Button watchTrailerButton, continueButton;
-    private Movie movie; // Movie object được chuyển từ Intent
-    private Cinema selectedCinema; // Rạp được chọn
+    private Movie movie;
+    private Cinema selectedCinema;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,14 +75,15 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
 
         // Nhận movie từ Intent
         Intent intent = getIntent();
-        movie = (Movie) intent.getSerializableExtra("movie"); // Lấy movie object từ Intent
+        int movieId = intent.getIntExtra("movieId", -1);
+        if (movieId == -1) {
+            finish();
+            return;
+        }
+
+        fetchMovieDetail(movieId);
 
         backBtn.setOnClickListener(v -> finish());
-
-
-        if (movie == null) finish();
-        displayMovieDetails();
-        fetchCinemasFromFirebase();
 
         // Xử lý khi nhấn nút "Watch Trailer"
         watchTrailerButton.setOnClickListener(v -> {
@@ -114,6 +115,31 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
             Intent editMovieIntent = new Intent(AdminMovieDetailActivity.this, EditMovieActivity.class);
             editMovieIntent.putExtra("movie", movie);
             startActivity(editMovieIntent);
+        });
+    }
+
+    private void fetchMovieDetail(int movieId) {
+        DatabaseReference movieRef = FirebaseDatabase.getInstance().getReference("Movies").child("Movie" + movieId);
+
+        movieRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                movie = snapshot.getValue(Movie.class);
+
+                if (movie == null) {
+                    Log.d("AdminMovieDetailActivity", "Movie not found");
+                    finish();
+                    return;
+                }
+
+                displayMovieDetails();
+                fetchCinemasFromFirebase();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
         });
     }
 
@@ -149,7 +175,7 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
     private void fetchCinemasFromFirebase() {
         DatabaseReference cinemaRef = FirebaseDatabase.getInstance().getReference("Cinemas");
 
-        cinemaRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        cinemaRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<Cinema> cinemaList = new ArrayList<>();

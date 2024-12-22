@@ -86,7 +86,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
     }
 
     private void loadUserInfo(String uid) {
-        userRef.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+        userRef.child(uid).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User userInfo = snapshot.getValue(User.class);
@@ -202,7 +202,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
         String cloudName = dotenv.get("CLOUDINARY_CLOUD_NAME");
         String imageUrl = String.format("https://res.cloudinary.com/%s/image/upload/q_auto/f_auto/%s", cloudName, publicId);
 
-        userRef.child(userUID).child("avatarUrl").addListenerForSingleValueEvent(new ValueEventListener() {
+        userRef.child(userUID).child("avatarUrl").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 String avatarUrl = snapshot.getValue(String.class);
