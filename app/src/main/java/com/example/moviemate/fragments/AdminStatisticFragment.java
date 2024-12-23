@@ -209,16 +209,21 @@ public class AdminStatisticFragment extends Fragment {
     private void calculateWeeklyRevenue() {
         if (monthSpinner.getSelectedItem() == null || yearSpinner.getSelectedItem() == null) return;
 
-        ArrayList<String> labels = new ArrayList<>();
-        for (int i = 1; i <= 4; i++) {
-            labels.add("Week " + i);
-        }
-
         String selectedMonthStr = monthSpinner.getSelectedItem().toString();
         int selectedMonth = Integer.parseInt(selectedMonthStr.replace("Month ", ""));
         int selectedYear = Integer.parseInt(yearSpinner.getSelectedItem().toString());
 
-        fetchRevenue(selectedMonth, selectedYear, labels, "weekly");
+        // Calculate the number of weeks in the selected month
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(selectedYear, selectedMonth - 1, 1); // Set to first day of month
+        int maxWeeks = calendar.getActualMaximum(Calendar.WEEK_OF_MONTH);
+
+        ArrayList<String> labels = new ArrayList<>();
+        for (int i = 1; i <= maxWeeks; i++) {
+            labels.add("Week " + i);
+        }
+
+        fetchWeeklyRevenue(selectedMonth, selectedYear, labels);
     }
 
     private void calculateMonthlyRevenue() {
@@ -249,6 +254,62 @@ public class AdminStatisticFragment extends Fragment {
 
     private void fetchRevenue(int month, int year, ArrayList<String> labels, String type) {
         fetchRevenue(month, year, labels, type, null);
+    }
+
+    private void fetchWeeklyRevenue(int month, int year, ArrayList<String> labels) {
+        ticketsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                ArrayList<BarEntry> entries = new ArrayList<>();
+                float[] revenue = new float[labels.size()];
+
+                for (DataSnapshot userTickets : snapshot.getChildren()) {
+                    for (DataSnapshot ticketSnapshot : userTickets.getChildren()) {
+                        String date = ticketSnapshot.child("date").getValue(String.class);
+                        Long totalPrice = ticketSnapshot.child("totalPrice").getValue(Long.class);
+
+                        if (date != null && totalPrice != null) {
+                            try {
+                                String[] dateParts = date.split("-");
+                                int ticketYear = Integer.parseInt(dateParts[0]);
+                                int ticketMonth = Integer.parseInt(dateParts[1]);
+                                int ticketDay = Integer.parseInt(dateParts[2]);
+
+                                if (ticketYear == year && ticketMonth == month) {
+                                    Calendar calendar = Calendar.getInstance();
+                                    calendar.setFirstDayOfWeek(Calendar.MONDAY);
+                                    calendar.setMinimalDaysInFirstWeek(4);
+                                    calendar.set(ticketYear, ticketMonth - 1, ticketDay);
+
+                                    // Get week of month (1-based)
+                                    int weekOfMonth = calendar.get(Calendar.WEEK_OF_MONTH) - 1;
+
+                                    // Check if the week index is valid
+                                    if (weekOfMonth >= 0 && weekOfMonth < revenue.length) {
+                                        revenue[weekOfMonth] += totalPrice;
+                                    }
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+
+                // Create entries for the bar chart
+                for (int i = 0; i < revenue.length; i++) {
+                    if (revenue[i] > 0) {
+                        entries.add(new BarEntry(i, revenue[i]));
+                    }
+                }
+
+                setupBarChart(entries, labels);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
     }
 
     private void fetchRevenue(int month, int year, ArrayList<String> labels, String type, ArrayList<Integer> monthValues) {
@@ -288,14 +349,7 @@ public class AdminStatisticFragment extends Fragment {
                                             }
                                         }
                                         break;
-                                    case "weekly":
-                                        if (ticketYear == year && ticketMonth == month) {
-                                            int weekOfMonth = calendar.get(Calendar.WEEK_OF_MONTH) - 1;
-                                            if (weekOfMonth >= 0 && weekOfMonth < 4) {
-                                                revenue[weekOfMonth] += totalPrice;
-                                            }
-                                        }
-                                        break;
+
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
