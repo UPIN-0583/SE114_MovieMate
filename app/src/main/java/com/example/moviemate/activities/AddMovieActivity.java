@@ -8,6 +8,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -67,7 +69,7 @@ public class AddMovieActivity extends AppCompatActivity {
     ImageButton backButton, editPosterButton;
     Button saveButton;
     ImageView movieBanner;
-    TextView addDirectorTv, addActorTv, addShowTimeTv;
+    TextView addDirectorTv, addActorTv, addShowTimeTv, titleShowTime;
     EditText timeHourEt, timeMinuteEt, yearEt, priceEt, languageEt, ratingEt, titleEt, genreEt, storylineEt,  trailerEt;
     Spinner statusSpinner;
     RecyclerView directorRv, actorRv, showTimeRv;
@@ -118,29 +120,19 @@ public class AddMovieActivity extends AppCompatActivity {
 
     private void setupViews() {
         addActorTv = findViewById(R.id.addActorTextView);
-        addActorTv.setOnClickListener(v -> {
-            addActor();
-        });
+        addActorTv.setOnClickListener(v -> addActor());
         addDirectorTv = findViewById(R.id.addDirectorTextView);
-        addDirectorTv.setOnClickListener(v -> {
-            addDirector();
-        });
+        addDirectorTv.setOnClickListener(v -> addDirector());
         addShowTimeTv = findViewById(R.id.addShowTimeTextView);
-        addShowTimeTv.setOnClickListener(v -> {
-            addShowTime();
-        });
+        addShowTimeTv.setOnClickListener(v -> addShowTime());
 
         backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> finish());
 
         editPosterButton = findViewById(R.id.editMovieBanner);
-        editPosterButton.setOnClickListener(v -> {
-            editPoster();
-        });
+        editPosterButton.setOnClickListener(v -> editPoster());
         saveButton = findViewById(R.id.saveButton);
-        saveButton.setOnClickListener(v -> {
-            addNewMovie();
-        });
+        saveButton.setOnClickListener(v -> addNewMovie());
 
         movieBanner = findViewById(R.id.movieBanner);
 
@@ -155,7 +147,32 @@ public class AddMovieActivity extends AppCompatActivity {
         storylineEt = findViewById(R.id.storylineTextEdit);
         trailerEt = findViewById(R.id.trailerUrlTextEdit);
         statusSpinner = findViewById(R.id.statusSpinner);
+        titleShowTime = findViewById(R.id.textView21);
+
+        // Add a listener to statusSpinner to show/hide addShowTimeTv based on the status
+        statusSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String status = statusSpinner.getSelectedItem().toString();
+                if ("Coming Soon".equalsIgnoreCase(status)) {
+                    addShowTimeTv.setVisibility(View.GONE);
+                    showTimeRv.setVisibility(View.GONE);
+                    titleShowTime.setVisibility(View.GONE);
+                } else if ("Now Playing".equalsIgnoreCase(status)) {
+                    addShowTimeTv.setVisibility(View.VISIBLE);
+                    showTimeRv.setVisibility(View.VISIBLE);
+                    titleShowTime.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Do nothing
+            }
+        });
     }
+
+
 
     private void addNewMovie() {
         saveButton.setEnabled(false);
@@ -224,8 +241,9 @@ public class AddMovieActivity extends AppCompatActivity {
             return false;
         }
 
-        if (dateTimes.isEmpty()) {
-            CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Error", "Show time cannot be empty", false);
+        String status = statusSpinner.getSelectedItem().toString();
+        if ("Now Playing".equalsIgnoreCase(status) && dateTimes.isEmpty()) {
+            CustomDialog.showAlertDialog(this, R.drawable.ic_error, "Error", "Show time cannot be empty for 'Now Playing'", false);
             return false;
         }
 

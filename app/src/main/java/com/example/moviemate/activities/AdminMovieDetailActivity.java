@@ -183,7 +183,35 @@ public class AdminMovieDetailActivity extends AppCompatActivity {
                 for (DataSnapshot cinemaSnapshot : snapshot.getChildren()) {
                     Cinema cinema = cinemaSnapshot.getValue(Cinema.class);
                     if (cinema != null) {
-                        cinemaList.add(cinema);
+                        DataSnapshot moviesSnapshot = cinemaSnapshot.child("Movies");
+                        boolean hasValidShowTime = false;
+
+                        // Kiểm tra xem có Movie khớp với movie đang chọn hay không
+                        for (DataSnapshot movieSnapshot : moviesSnapshot.getChildren()) {
+                            String movieIdKey = "Movie" + movie.getMovieID(); // Khớp theo định dạng Movie1, Movie2
+                            if (movieSnapshot.getKey().equals(movieIdKey)) {
+                                DataSnapshot showTimesSnapshot = movieSnapshot.child("ShowTimes");
+
+                                // Kiểm tra nếu có bất kỳ suất chiếu nào trong `ShowTimes`
+                                if (showTimesSnapshot.exists()) {
+                                    for (DataSnapshot dateSnapshot : showTimesSnapshot.getChildren()) {
+                                        for (DataSnapshot timeSnapshot : dateSnapshot.getChildren()) {
+                                            if (timeSnapshot.child("Seats").exists()) {
+                                                hasValidShowTime = true;
+                                                break;
+                                            }
+                                        }
+                                        if (hasValidShowTime) break;
+                                    }
+                                }
+                            }
+                            if (hasValidShowTime) break;
+                        }
+
+                        // Chỉ thêm Cinema vào danh sách nếu có suất chiếu hợp lệ
+                        if (hasValidShowTime) {
+                            cinemaList.add(cinema);
+                        }
                     }
                 }
 
