@@ -16,6 +16,7 @@ import com.example.moviemate.R;
 import com.example.moviemate.adapters.MovieSearchAdapter;
 import com.example.moviemate.adapters.FilterAdapter;
 import com.example.moviemate.models.Movie;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -47,6 +48,7 @@ public class SearchActivity extends AppCompatActivity implements FilterAdapter.O
     private List<String> selectedYears;
     private List<String> selectedLanguages;
     private ImageButton clearButton;
+    private boolean isAdmin;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,9 +56,7 @@ public class SearchActivity extends AppCompatActivity implements FilterAdapter.O
         setContentView(R.layout.activity_search);
 
         initializeViews();
-        setupRecyclerViews();
-        loadMoviesFromDatabase();
-        setupListeners();
+        checkUserRole();
     }
 
     private void initializeViews() {
@@ -75,10 +75,38 @@ public class SearchActivity extends AppCompatActivity implements FilterAdapter.O
         selectedLanguages = new ArrayList<>();
     }
 
+    private void checkUserRole() {
+        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Users").child(currentUserId);
+
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    String role = snapshot.child("role").getValue(String.class);
+                    isAdmin = "admin".equals(role);
+                } else {
+                    isAdmin = false;
+                }
+                setupRecyclerViews();
+                loadMoviesFromDatabase();
+                setupListeners();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                isAdmin = false;
+                setupRecyclerViews();
+                loadMoviesFromDatabase();
+                setupListeners();
+            }
+        });
+    }
+
     private void setupRecyclerViews() {
         // Setup main movies recycler
         searchResultRecycler.setLayoutManager(new LinearLayoutManager(this));
-        searchResultAdapter = new MovieSearchAdapter(this, filteredMovies);
+        searchResultAdapter = new MovieSearchAdapter(this, filteredMovies, isAdmin);
         searchResultRecycler.setAdapter(searchResultAdapter);
 
         // Setup filter recyclers
