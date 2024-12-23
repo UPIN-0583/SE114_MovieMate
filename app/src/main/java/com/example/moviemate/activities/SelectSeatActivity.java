@@ -27,6 +27,7 @@ import com.example.moviemate.models.Movie;
 import com.example.moviemate.utils.CustomDialog;
 import com.example.moviemate.utils.MoneyFormatter;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -160,12 +161,39 @@ public class SelectSeatActivity extends AppCompatActivity {
                 result -> {
                     if (result.getResultCode() == RESULT_CANCELED) return;
 
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    if (user == null) {
+                        Toast.makeText(this, "Please log in to buy tickets", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
                     saveTicketToFirebase();
-                    Intent intent = new Intent(this, MainActivity.class);
-                    // Xóa các Activity khác và tạo mới MainActivity
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                    finish();
+
+                    FirebaseDatabase.getInstance().getReference("Users")
+                            .child(user.getUid())
+                            .child("role")
+                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    String role = snapshot.getValue(String.class);
+                                    if (role == null) return;
+
+                                    Intent intent;
+                                    if (role.equals("admin")) {
+                                        intent = new Intent(SelectSeatActivity.this, AdminMainActivity.class);
+                                    } else {
+                                        intent = new Intent(SelectSeatActivity.this, MainActivity.class);
+                                    }
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(intent);
+                                    finish();
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
                 }
         );
     }
